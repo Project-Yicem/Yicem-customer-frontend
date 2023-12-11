@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, StyleSheet, Image } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
+import styles, { theme } from '../Styles/styles';
 
 const logoImg = require('../assets/logo.png');
 
@@ -36,27 +37,3 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fdbcb4',
-  },
-  input: {
-    marginBottom: 16,
-    width: '80%', 
-  },
-  button: {
-    marginBottom: 16,
-    width: '80%', 
-    backgroundColor: "#f26f55",
-  },
-  image: {
-    width: 300,
-    height: 200,
-    resizeMode: 'contain',
-  },
-});

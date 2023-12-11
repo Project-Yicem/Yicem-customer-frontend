@@ -4,18 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import LoginScreen from './Screens/LoginScreen';
 import RegisterScreen from './Screens/RegisterScreen';
+import styles, { theme } from './Styles/styles';
 
 const Stack = createNativeStackNavigator();
-
-const theme = {
-  ...DefaultTheme,
-  roundness: 2,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: "#f26f55", //warm color
-    accent: '#fdbcb4',  //warm color
-  },
-};
 
 export default function App() {
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, View, StyleSheet, Image } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import styles, { theme } from '../Styles/styles';
 
 const logoImg = require('../assets/logo.png');
 
@@ -39,32 +40,4 @@ export default function LoginScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fdbcb4',
-  },
-  input: {
-    marginBottom: 16,
-    width: '80%', 
-  },
-  button: {
-    marginBottom: 16,
-    width: '80%',
-  },
-  signupText: {
-    textAlign: 'center',
-    color: "#f26f55",
-    fontSize: 16,
-  },
-  image: {
-    width: 300,
-    height: 200,
-    resizeMode: 'contain',
-  },
-});
   
