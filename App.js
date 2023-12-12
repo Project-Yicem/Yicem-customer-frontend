@@ -7,6 +7,7 @@ import RegisterScreen from "./Screens/RegisterScreen";
 import styles, { theme } from "./Styles/styles";
 import BusinessesScreen from "./Screens/BusinessesScreen";
 import TestingPage from "./Screens/TestingPage";
+import BusinessDetailsScreen from "./Screens/BusinessDetailsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,13 +17,17 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerShown: true,
+            headerShown: false,
           }}
         >
           <Stack.Screen name="Testing" component={TestingPage} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Businesses" component={BusinessesScreen} />
+          <Stack.Screen
+            name="BusinessDetailsScreen"
+            component={BusinessDetailsScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
