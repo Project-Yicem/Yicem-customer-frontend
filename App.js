@@ -2,15 +2,15 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
-import LoginScreen from "./Screens/LoginScreen";
-import RegisterScreen from "./Screens/RegisterScreen";
+import LoginScreen from "./screens/LoginScreen";
+import RegisterScreen from "./screens/RegisterScreen";
 import styles, { theme } from "./Styles/styles";
-import BusinessesScreen from "./Screens/BusinessesScreen";
-import TestingPage from "./Screens/TestingPage";
-import BusinessDetailsScreen from "./Screens/BusinessDetailsScreen";
+import BusinessesScreen from "./screens/BusinessesScreen";
+import TestingPage from "./screens/TestingPage";
+import BusinessDetailsScreen from "./screens/BusinessDetailsScreen";
+import HomeScreen from "./screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
-
 export default function App() {
   return (
     <PaperProvider theme={theme}>
@@ -24,6 +24,7 @@ export default function App() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Businesses" component={BusinessesScreen} />
+          <Stack.Screen name="HomeScreen" component={HomeScreen} />
           <Stack.Screen
             name="BusinessDetailsScreen"
             component={BusinessDetailsScreen}

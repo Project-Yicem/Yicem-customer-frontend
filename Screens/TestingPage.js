@@ -23,6 +23,13 @@ export default function TestingPage({ navigation }) {
       >
         Go to businesses page
       </Button>
+      <Button
+        mode="outlined"
+        style={{ margin: 4 }}
+        onPress={() => navigation.navigate("HomeScreen")}
+      >
+        Go to home page
+      </Button>
     </SafeAreaView>
   );
 }
