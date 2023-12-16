@@ -5,53 +5,8 @@ import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 
-const businessesData = [
-  {
-    id: 1,
-    name: "Velocity Cafe",
-    logo: require("../assets/businesslogos/logo_bakery.png"),
-    isOpen: true,
-    availableOffers: true,
-    openingTime: "10:00",
-    closingTime: "20:00",
-  },
-  {
-    id: 2,
-    name: "Beethoven Cafe",
-    logo: require("../assets/businesslogos/logo_coffee.png"),
-    isOpen: true,
-    availableOffers: true,
-    openingTime: "10:00",
-    closingTime: "20:00",
-  },
-  {
-    id: 3,
-    name: "Cafe Fiery",
-    logo: require("../assets/businesslogos/logo_F.jpeg"),
-    isOpen: true,
-    availableOffers: true,
-    openingTime: "10:00",
-    closingTime: "20:00",
-  },
-  {
-    id: 4,
-    name: "Rooftop Restaurant",
-    logo: require("../assets/businesslogos/logo_salad.png"),
-    isOpen: true,
-    availableOffers: false,
-    openingTime: "10:00",
-    closingTime: "20:00",
-  },
-  {
-    id: 5,
-    name: "Tea Break",
-    logo: require("../assets/businesslogos/logo_tea.jpeg"),
-    isOpen: false,
-    availableOffers: true,
-    openingTime: "10:00",
-    closingTime: "20:00",
-  },
-];
+// Import the businessesData from the JSON file
+import businessesData from "../DataFiles/businessesData.js";
 
 const BusinessesScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,12 +45,12 @@ const BusinessesScreen = ({ navigation }) => {
                 colors={
                   business.isOpen
                     ? business.availableOffers
-                      ? ["#f23545", "#ff9c6b"] // Open with offers: red to orange gradient
-                      : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"] // Open without offers: semi-transparent red to orange gradient
-                    : ["#808080", "#ffffff"] // Closed: gray to white gradient
+                      ? ["#f23545", "#ff9c6b"]
+                      : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"]
+                    : ["#808080", "#ffffff"]
                 }
-                start={{ x: 0, y: 0.5 }} // left-to-right
-                end={{ x: 1, y: 0.5 }} // left-to-right
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
                 style={{ borderRadius: 8, padding: 6 }}
               >
                 <Card.Content

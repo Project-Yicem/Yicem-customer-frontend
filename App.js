@@ -5,9 +5,9 @@ import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import styles, { theme } from "./Styles/styles";
-import BusinessesScreen from "./screens/BusinessesScreen";
+import BusinessesScreen from "./Screens/BusinessesScreen";
 import TestingPage from "./screens/TestingPage";
-import BusinessDetailsScreen from "./screens/BusinessDetailsScreen";
+import BusinessDetailsScreen from "./Screens/BusinessDetailsScreen";
 import HomeScreen from "./screens/HomeScreen";
 
 const Stack = createNativeStackNavigator();
