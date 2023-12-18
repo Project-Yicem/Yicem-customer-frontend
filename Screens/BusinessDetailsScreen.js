@@ -24,7 +24,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             color="white"
             style={{ marginBottom: 8 }}
           />
-        </TouchableOpacity>{" "}
+        </TouchableOpacity>{""}
         {/* Upper Section */}
         <View style={{ flexDirection: "row", padding: 16, marginTop: 24 }}>
           {/* Left Section */}
@@ -45,7 +45,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                {business.address}
+                <Text> {business.address} </Text>
               </Paragraph>
             </View>
             <View
@@ -61,10 +61,10 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                {business.rating}
+                <Text> {business.rating} </Text>
               </Paragraph>
               <Button mode="text" compact textColor="#ffe6a3">
-                View Reviews
+                <Text> View Reviews </Text>
               </Button>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
@@ -74,7 +74,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                Add to your favorites
+                <Text> Add to your favorites </Text>
               </Paragraph>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
@@ -90,7 +90,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 mode="contained"
                 buttonColor="#f2b149"
               >
-                Report
+                <Text>Report</Text>
               </Button>
             </View>
           </View>
@@ -110,7 +110,9 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             />
             <Paragraph
               style={{ color: "white" }}
-            >{`Open hours: ${business.openingTime} to ${business.closingTime}`}</Paragraph>
+            >
+              <Text> {`Open hours: ${business.openingTime} to ${business.closingTime}`} </Text>
+            </Paragraph>
           </View>
         </View>
       </LinearGradient>
