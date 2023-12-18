@@ -1,37 +1,49 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { View, Image, TouchableOpacity } from "react-native";
-import { Text, Title, IconButton, Paragraph, Button } from "react-native-paper";
+import { View, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  Text,
+  Title,
+  IconButton,
+  Paragraph,
+  Button,
+  Card,
+} from "react-native-paper";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const BusinessDetailsScreen = ({ navigation, route }) => {
   const { business } = route.params;
 
   return (
-    <View>
+    <ScrollView>
       <LinearGradient
-        colors={["#f25e35", "#ff9c6b"]}
+        colors={
+          business.isOpen ? ["#f25e35", "#ff9c6b"] : ["#808080", "#cacaca"]
+        }
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("Businesses")}
-          style={{ position: "absolute", top: 16, left: 16, zIndex: 1 }}
+          onPress={() => navigation.goBack()}
+          style={{ margin: 8, marginTop: 30, zIndex: 1 }}
         >
-          <FontAwesome5Icon
-            name="arrow-left"
-            size={24}
-            color="white"
-            style={{ marginBottom: 8 }}
-          />
-        </TouchableOpacity>{" "}
-        {/* Upper Section */}
-        <View style={{ flexDirection: "row", padding: 16, marginTop: 24 }}>
-          {/* Left Section */}
+          <FontAwesome5Icon name="arrow-left" size={24} color="white" />
+        </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            padding: 16,
+            marginTop: 8,
+          }}
+        >
           <View style={{ flex: 1 }}>
-            <Text style={{ color: "white" }} variant="headlineLarge">
+            <Text style={{ color: "white" }} variant="headlineMedium">
               {business.name}
             </Text>
+            <Paragraph style={{ color: "white" }}>
+              Open hours: {business.openingTime} to {business.closingTime}
+            </Paragraph>
             <View
               style={{
                 flexDirection: "row",
@@ -94,29 +106,58 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
               </Button>
             </View>
           </View>
-
-          {/* Right Section */}
-          <View
-            style={{
-              alignItems: "center",
-              alignContent: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={{ flexDirection: "column" }}>
             <Image
               source={business.logo}
-              style={{ width: 180, height: 180, borderRadius: 8 }}
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 8,
+              }}
               backgroundColor="white"
             />
-            <Paragraph
-              style={{ color: "white" }}
-            >{`Open hours: ${business.openingTime} to ${business.closingTime}`}</Paragraph>
           </View>
         </View>
       </LinearGradient>
-
-      {/* Bottom Section - To be implemented later */}
-    </View>
+      <View style={{ padding: 16 }}>
+        <Title>Available Offers</Title>
+        {business.isOpen ? (
+          business.offers.length > 0 ? (
+            business.offers.map((offer, index) => (
+              <TouchableOpacity key={index}>
+                <Card
+                  mode="outlined"
+                  style={{
+                    marginBottom: 12,
+                    borderColor: "#f2b149",
+                    borderWidth: 1,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Card.Content
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text>{offer.name}</Text>
+                    <Text>{offer.price}</Text>
+                  </Card.Content>
+                </Card>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Paragraph style={{ fontStyle: "italic" }}>
+              No offers available right now.
+            </Paragraph>
+          )
+        ) : (
+          <Paragraph style={{ fontStyle: "italic" }}>
+            Business is closed, come back later.
+          </Paragraph>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 

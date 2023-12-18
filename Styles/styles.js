@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     margin: 16,
-    marginTop: 30,
+    marginTop: 40,
     backgroundColor: "#ffffff",
   },
   businessCard: {

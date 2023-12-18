@@ -5,7 +5,6 @@ import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 
-// Import the businessesData from the JSON file
 import businessesData from "../DataFiles/businessesData.js";
 
 const BusinessesScreen = ({ navigation }) => {

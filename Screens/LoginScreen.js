@@ -11,6 +11,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = () => {
     console.log(`Login pressed with email: ${email} and password: ${password}`);
+    navigation.navigate("MainHome");
   };
 
   return (
