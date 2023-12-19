@@ -124,11 +124,21 @@ const ProfileScreen = () => {
                         justifyContent: "space-between",
                         }}
                     >
-                        <Text>Business Name</Text>
-                        <Text>Offer Name</Text>
-                        <Text>Offer Price</Text>
-                        <Text>Purchase Date</Text>
-                        <Button title="Leave a Review" onPress={handleLeaveReview}> Leave a Review </Button>
+                        <View style={{
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        }}>
+                            <Text variant="titleLarge">Velocity Cafe</Text>
+                            <View style={{
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                            }}>
+                            <Text style={{marginTop:7}} variant="bodyLarge">Savory Box</Text>
+                            <Text style={{marginLeft:10, marginTop:7}} variant="bodyLarge">40 TL</Text>
+                            <Button style={{marginLeft:80}} title="Leave a Review"  compact="true" onPress={handleLeaveReview}> Leave a Review </Button>
+                            </View>
+                            <Text variant="bodyLarge">21/12/2023</Text>
+                        </View>
                     </Card.Content>
                 </Card>
                 <Button title="View All Past Purchases" mode="text" buttonColor="white" onPress={handleViewAllPurchases}> View All Past Purchases </Button> 
