@@ -10,6 +10,8 @@ const businessData = [
     distance: "300m",
     rating: "4.5",
     address: "Bilkent A Building, 1st floor",
+    latitude: 39.86613476149862,
+    longitude: 32.74841331751553,
     offers: [
       { name: "Savory Box", price: "45 ₺" },
       { name: "Sweet Box", price: "75 ₺" },
@@ -27,6 +29,8 @@ const businessData = [
     distance: "350m",
     rating: "4.0",
     address: "Bilkent B Building, 2nd floor",
+    latitude: 39.86883769578915, 
+    longitude: 32.74804230022964,
     offers: [
       { name: "Savory Box", price: "45 ₺" },
       { name: "Sweet Box", price: "75 ₺" },
@@ -45,6 +49,8 @@ const businessData = [
     distance: "700m",
     rating: "4.2",
     address: "Bilkent M Building, 3rd floor",
+    latitude: 39.866477179576485,
+    longitude: 32.74918382453541,
     offers: [
       { name: "Savory Box", price: "45 ₺" },
       { name: "Sweet Box", price: "75 ₺" },
@@ -63,6 +69,8 @@ const businessData = [
     distance: "400m",
     rating: "4.8",
     address: "Bilkent C Building, 4th floor",
+    latitude: 39.867819957719306, 
+    longitude: 32.74816290905867,
     offers: [],
   },
   {
@@ -76,6 +84,8 @@ const businessData = [
     distance: "600m",
     rating: "4.1",
     address: "Bilkent SA Building, 1st floor",
+    latitude: 39.86828221142914, 
+    longitude: 32.74911772286561,
     offers: [{ name: "Savory Box", price: "45 ₺" }],
   },
 ];

@@ -3,7 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import HomeScreen from "../Screens/HomeScreen";
 import BusinessesScreen from "../Screens/BusinessesScreen";
-import ProfileScreen from "../screens/ProfileScreen";
+import ProfileScreen from "../Screens/ProfileScreen";
+import MapScreen from "../Screens/MapScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +43,7 @@ const MainTabs = () => (
     />
     <Tab.Screen
       name="Map"
-      component={HomeScreen}
+      component={MapScreen}
       options={{ headerShown: false }}
     />
     <Tab.Screen

@@ -122,7 +122,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
       <View style={{ padding: 16 }}>
         <Title>Available Offers</Title>
         {business.isOpen ? (
-          business.offers.length > 0 ? (
+          Array.isArray(business.offers) && business.offers.length > 0 ? (
             business.offers.map((offer, index) => (
               <TouchableOpacity key={index}>
                 <Card
