@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import HomeScreen from "../Screens/HomeScreen";
 import BusinessesScreen from "../Screens/BusinessesScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,11 +20,11 @@ const MainTabs = () => (
           route.name === "BusinessDetailsScreen"
         ) {
           iconName = "cafe";
-        } /*else if (route.name == "Map") {
+        } else if (route.name == "Map") {
           iconName = "map";
         } else if (route.name === "Profile") {
           iconName = focused ? "person" : "person-outline";
-        }*/
+        }
 
         return <Ionicons name={iconName} size={size} color={color} />;
       },
@@ -40,8 +41,18 @@ const MainTabs = () => (
       options={{ headerShown: false }}
     />
     <Tab.Screen
+      name="Map"
+      component={HomeScreen}
+      options={{ headerShown: false }}
+    />
+    <Tab.Screen
       name="Businesses"
       component={BusinessesScreen}
+      options={{ headerShown: false }}
+    />
+    <Tab.Screen
+      name="Profile"
+      component={ProfileScreen}
       options={{ headerShown: false }}
     />
   </Tab.Navigator>
