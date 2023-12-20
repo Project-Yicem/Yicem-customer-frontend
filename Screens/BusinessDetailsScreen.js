@@ -8,11 +8,29 @@ import {
   Paragraph,
   Button,
   Card,
+  Modal,
+  Portal,
+  RadioButton,
+  Dialog
 } from "react-native-paper";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const BusinessDetailsScreen = ({ navigation, route }) => {
+  const containerStyle = {backgroundColor: 'white', padding: 20};
+  
   const { business } = route.params;
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [dialogVisible, setDialogVisible] = React.useState(false);
+  const [checked, setChecked] = React.useState('');
+
+  const showModal = () => setModalVisible(true);
+  const hideModal = () => setModalVisible(false); 
+
+  const showDialog = () => {
+    setDialogVisible(true);
+    hideModal();
+  }
+  const hideDialog = () => setDialogVisible(false);
 
   return (
     <ScrollView>
@@ -120,11 +138,42 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
         </View>
       </LinearGradient>
       <View style={{ padding: 16 }}>
+        <Portal>
+          <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>  
+            <Title>Choose A Time To Pick Up The Box</Title>
+            <View style={{ flexDirection: "row"}}>
+              <RadioButton value="first" status={checked === "first" ? "checked" : "unchecked" } onPress={() => setChecked("first")}/>  
+              <Text style={{marginTop:10}}> 17:00-17.30 </Text>
+            </View>
+            <View style={{ flexDirection: "row"}}>
+              <RadioButton value="second" status={checked === "second" ? "checked" : "unchecked" } onPress={() => setChecked("second")}/>
+              <Text style={{marginTop:10}}> 17:30-18:00 </Text>
+            </View>
+            <View style={{ flexDirection: "row"}}>
+              <RadioButton value="third" status={checked === "third" ? "checked" : "unchecked" } onPress={() => setChecked("third")}/>
+              <Text style={{marginTop:10}}> 18:30-19:00 </Text>
+            </View>
+            <Button mode="contained" onPress={showDialog}>Make A Reservation</Button>  
+          </Modal>
+        </Portal>
+
+        <Portal>
+          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
+            <Dialog.Content>
+              <Title>Reservation Successful</Title>
+              <Paragraph>You can pick up your box between 17:30-18:00.</Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={hideDialog}>OK</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal> 
+
         <Title>Available Offers</Title>
         {business.isOpen ? (
           business.offers.length > 0 ? (
             business.offers.map((offer, index) => (
-              <TouchableOpacity key={index}>
+              <TouchableOpacity key={index} onPress={showModal}>
                 <Card
                   mode="outlined"
                   style={{
