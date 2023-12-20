@@ -8,6 +8,7 @@ const logoImg = require('../assets/logo.png');
 export default function RegisterScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState();
+  const [name,setName] = useState();
 
   const handleRegister = () => {
     console.log(`Registration pressed with email: ${email} and password: ${password}`);
@@ -17,6 +18,13 @@ export default function RegisterScreen({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <Image source={logoImg} style={styles.image} />
+      <TextInput
+        label="Enter Username"
+        value={name}
+        onChangeText={(text) => setName(text)}
+        mode="outlined"
+        style={styles.input}
+      />
       <TextInput
         label="Enter Email"
         value={email}
