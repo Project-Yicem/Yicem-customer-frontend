@@ -5,12 +5,13 @@ import styles, { theme } from '../Styles/styles';
 
 const logoImg = require('../assets/logo.png');
 
-export default function RegisterScreen() {
+export default function RegisterScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState();
 
   const handleRegister = () => {
     console.log(`Registration pressed with email: ${email} and password: ${password}`);
+    navigation.navigate("MainHome");
   };
 
   return (
