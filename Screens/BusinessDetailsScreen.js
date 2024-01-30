@@ -17,8 +17,20 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const BusinessDetailsScreen = ({ navigation, route }) => {
   const containerStyle = {backgroundColor: 'white', padding: 20};
-  
   const { business } = route.params;
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [dialogVisible, setDialogVisible] = React.useState(false);
+  const [checked, setChecked] = React.useState('');
+
+  const showModal = () => setModalVisible(true);
+  const hideModal = () => setModalVisible(false); 
+
+  const showDialog = () => {
+    setDialogVisible(true);
+    hideModal();
+  }
+  const hideDialog = () => setDialogVisible(false);
+
   const [modalVisible, setModalVisible] = React.useState(false);
   const [dialogVisible, setDialogVisible] = React.useState(false);
   const [checked, setChecked] = React.useState('');
@@ -75,7 +87,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                {business.address}
+                <Text> {business.address} </Text>
               </Paragraph>
             </View>
             <View
@@ -91,10 +103,10 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                {business.rating}
+                <Text> {business.rating} </Text>
               </Paragraph>
               <Button mode="text" compact textColor="#ffe6a3">
-                View Reviews
+                <Text> View Reviews </Text>
               </Button>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
@@ -104,7 +116,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                Add to your favorites
+                <Text> Add to your favorites </Text>
               </Paragraph>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
@@ -120,7 +132,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 mode="contained"
                 buttonColor="#f2b149"
               >
-                Report
+                <Text>Report</Text>
               </Button>
             </View>
           </View>
@@ -138,6 +150,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
         </View>
       </LinearGradient>
       <View style={{ padding: 16 }}>
+      <Portal>
         <Portal>
           <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>  
             <Title>Choose A Time To Pick Up The Box</Title>
@@ -168,10 +181,9 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             </Dialog.Actions>
           </Dialog>
         </Portal> 
-
         <Title>Available Offers</Title>
         {business.isOpen ? (
-          business.offers.length > 0 ? (
+          Array.isArray(business.offers) && business.offers.length > 0 ? (
             business.offers.map((offer, index) => (
               <TouchableOpacity key={index} onPress={showModal}>
                 <Card

@@ -10,6 +10,7 @@ import TestingPage from "./screens/TestingPage";
 import BusinessDetailsScreen from "./screens/BusinessDetailsScreen";
 import HomeScreen from "./screens/HomeScreen";
 import MainTabs from "./Components/MainTabs";
+import MapScreen from "./Screens/MapScreen";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
             component={BusinessDetailsScreen}
           />
           <Stack.Screen name="MainHome" component={MainTabs} />
+          <Stack.Screen name="Map" component={MapScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

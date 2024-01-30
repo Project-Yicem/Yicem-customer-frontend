@@ -30,6 +30,13 @@ export default function TestingPage({ navigation }) {
       >
         Go to home page
       </Button>
+      <Button
+        mode="outlined"
+        style={{ margin: 4 }}
+        onPress={() => navigation.navigate("Map")}
+      >
+        Go to map page
+      </Button>
     </SafeAreaView>
   );
 }

@@ -66,11 +66,11 @@ const ProfileScreen = () => {
                             justifyContent: "space-between",
                         }}
                     >
-                        <Text variant="headlineSmall">{name}</Text>
+                        <Text variant="titleLarge" style={{marginTop:12}}>{name}</Text>
                         <IconButton
                             icon="rename-box"
                             iconColor="#A9A9A9"
-                            size={20}
+                            size={25}
                             onPress={() => console.log('Pressed')}
                         />
                     </Card.Content>
@@ -89,11 +89,11 @@ const ProfileScreen = () => {
                             justifyContent: "space-between",
                         }}
                     >
-                        <Text variant="headlineSmall">{email}</Text>
+                        <Text variant="titleMedium" style={{marginTop:12}}>{email}</Text>
                         <IconButton
                             icon="rename-box"
                             iconColor="#A9A9A9"
-                            size={20}
+                            size={25}
                             onPress={() => console.log('Pressed')}
                         />
                     </Card.Content>
@@ -135,7 +135,7 @@ const ProfileScreen = () => {
                             }}>
                             <Text style={{marginTop:7}} variant="bodyLarge">Savory Box</Text>
                             <Text style={{marginLeft:10, marginTop:7}} variant="bodyLarge">40 TL</Text>
-                            <Button style={{marginLeft:80}} title="Leave a Review" compact="true" onPress={handleLeaveReview}> Leave a Review </Button>
+                            <Button style={{marginLeft:20}} mode="contained" title="Leave a Review"  compact="true" onPress={handleLeaveReview}> Leave a Review </Button>
                             </View>
                             <Text variant="bodyLarge">21/12/2023</Text>
                         </View>
