@@ -18,6 +18,18 @@ import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 const BusinessDetailsScreen = ({ navigation, route }) => {
   const containerStyle = {backgroundColor: 'white', padding: 20};
   const { business } = route.params;
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [dialogVisible, setDialogVisible] = React.useState(false);
+  const [checked, setChecked] = React.useState('');
+
+  const showModal = () => setModalVisible(true);
+  const hideModal = () => setModalVisible(false); 
+
+  const showDialog = () => {
+    setDialogVisible(true);
+    hideModal();
+  }
+  const hideDialog = () => setDialogVisible(false);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [dialogVisible, setDialogVisible] = React.useState(false);
@@ -139,6 +151,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
       </LinearGradient>
       <View style={{ padding: 16 }}>
       <Portal>
+        <Portal>
           <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>  
             <Title>Choose A Time To Pick Up The Box</Title>
             <View style={{ flexDirection: "row"}}>
