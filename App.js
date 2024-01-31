@@ -11,6 +11,7 @@ import BusinessDetailsScreen from "./Screens/BusinessDetailsScreen";
 import HomeScreen from "./Screens/HomeScreen";
 import MainTabs from "./Components/MainTabs";
 import MapScreen from "./Screens/MapScreen";
+import PastPurchasesScreen from "./Screens/PastPurchasesScreen";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           />
           <Stack.Screen name="MainHome" component={MainTabs} />
           <Stack.Screen name="Map" component={MapScreen} />
+          <Stack.Screen name="PastPurchases" component={PastPurchasesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

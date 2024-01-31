@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fdbcb4",
+    backgroundColor: "white",
   },
   input: {
     marginBottom: 16,

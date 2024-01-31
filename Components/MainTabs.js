@@ -1,60 +1,60 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../Screens/HomeScreen";
 import BusinessesScreen from "../Screens/BusinessesScreen";
 import ProfileScreen from "../Screens/ProfileScreen";
 import MapScreen from "../Screens/MapScreen";
+import PastPurchasesScreen from "../Screens/PastPurchasesScreen";
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const MainTabs = () => (
   <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused, color, size }) => {
-        let iconName;
-
-        if (route.name === "HomeScreen") {
-          iconName = "home";
-        } else if (
-          route.name === "Businesses" ||
-          route.name === "BusinessDetailsScreen"
-        ) {
-          iconName = "cafe";
-        } else if (route.name == "Map") {
-          iconName = "map";
-        } else if (route.name === "Profile") {
-          iconName = focused ? "person" : "person-outline";
-        }
-
-        return <Ionicons name={iconName} size={size} color={color} />;
-      },
-    })}
-    tabBarOptions={{
-      activeTintColor: "tomato",
-      inactiveTintColor: "gray",
-      showLabel: false,
-    }}
+    initialRouteName="Home"
+    activeColor="rgb(254, 93, 0)"
+    barStyle={{ backgroundColor: "white", height: 70 }}
+    labeled={false}
+    options={{ tabBarColor: "black" }}
   >
     <Tab.Screen
-      name="HomeScreen"
+      name="Home"
       component={HomeScreen}
-      options={{ headerShown: false }}
+      options={{
+        tabBarLabel: "Home",
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="home" color={color} size={26} />
+        ),
+      }}
     />
     <Tab.Screen
       name="Map"
       component={MapScreen}
-      options={{ headerShown: false }}
+      options={{
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="map" color={color} size={26} />
+        ),
+      }}
     />
     <Tab.Screen
       name="Businesses"
       component={BusinessesScreen}
-      options={{ headerShown: false }}
+      options={{
+        tabBarLabel: "Businesses",
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="coffee" color={color} size={26} />
+        ),
+      }}
     />
     <Tab.Screen
       name="Profile"
       component={ProfileScreen}
-      options={{ headerShown: false }}
+      options={{
+        tabBarLabel: "Profile",
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="account" color={color} size={26} />
+        ),
+      }}
     />
   </Tab.Navigator>
 );

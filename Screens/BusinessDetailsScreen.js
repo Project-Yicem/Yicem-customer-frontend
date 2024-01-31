@@ -42,7 +42,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
       >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{ margin: 8, marginTop: 30, zIndex: 1 }}
+          style={{ margin: 8, marginTop: 40, zIndex: 1 }}
         >
           <FontAwesome5Icon name="arrow-left" size={24} color="white" />
         </TouchableOpacity>
@@ -74,7 +74,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                <Text> {business.address} </Text>
+                {business.address}
               </Paragraph>
             </View>
             <View
@@ -90,10 +90,10 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                <Text> {business.rating} </Text>
+                {business.rating}
               </Paragraph>
               <Button mode="text" compact textColor="#ffe6a3">
-                <Text> View Reviews </Text>
+                View Reviews
               </Button>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
@@ -103,7 +103,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                <Text> Add to your favorites </Text>
+                Add to your favorites
               </Paragraph>
             </View>
             <View style={{ flexDirection: "row", marginTop: 16 }}>
