@@ -1,34 +1,28 @@
 import React, { useState } from "react";
 import { View, ScrollView } from "react-native";
-import { Searchbar, Card, Title, Paragraph } from "react-native-paper";
-import styles, { theme } from "../Styles/styles";
+import { Searchbar, Card, Title, Paragraph, Appbar } from "react-native-paper";
+import styles, { theme } from "../Styles/styles.js";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 
 import businessesData from "../DataFiles/businessesData.js";
 
-const BusinessesScreen = ({ navigation }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredBusinesses = businessesData.filter((business) =>
-    business.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+const FavoriteBusinessesScreen = ({ navigation }) => {
+  const businesses = businessesData;
 
   return (
-    <View>
-      <LinearGradient
-        colors={["#ff8069", "rgba(0,0,0,0)"]}
-        locations={[0, 0.5]} // Adjust the values based on your preference
-      >
-        <Searchbar
-          placeholder="Search for businesses..."
-          onChangeText={(query) => setSearchQuery(query)}
-          value={searchQuery}
-          style={styles.searchBar}
+    <View style={{ flex: 1 }}>
+      <Appbar.Header style={{ backgroundColor: "#f25e35" }}>
+        <Appbar.Action
+          icon="arrow-left"
+          color="white"
+          onPress={() => navigation.goBack()}
         />
-      </LinearGradient>
+        <Appbar.Content title="Your Favorites" color="white" />
+      </Appbar.Header>
+
       <ScrollView>
-        {filteredBusinesses.map((business) => (
+        {businesses.map((business) => (
           <TouchableOpacity
             key={business.id}
             onPress={() =>
@@ -79,4 +73,4 @@ const BusinessesScreen = ({ navigation }) => {
   );
 };
 
-export default BusinessesScreen;
+export default FavoriteBusinessesScreen;

@@ -14,7 +14,7 @@ const HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <View style={{ marginTop: 20 }}>
+    <View>
       <LinearGradient
         colors={["#ff8069", "rgba(0,0,0,0)"]}
         locations={[0, 0.5]} // Adjust the values based on your preference

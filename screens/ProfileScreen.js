@@ -19,6 +19,16 @@ const ProfileScreen = ({ navigation }) => {
   const [email, setEmail] = useState("johndoe@example.com");
   const [isReviewModalVisible, setReviewModalVisible] = useState(false);
   const [reviewText, setReviewText] = useState("");
+  const [isChangePasswordModalVisible, setChangePasswordModalVisible] =
+    useState(false);
+  const [isHelpModalVisible, setHelpModalVisible] = useState(false);
+
+  const handleChangePassword = () => {
+    setChangePasswordModalVisible(false);
+  };
+  const handleHelpClose = () => {
+    setHelpModalVisible(false);
+  };
 
   const buttonTexts = [
     "Favorite Businesses",
@@ -28,10 +38,6 @@ const ProfileScreen = ({ navigation }) => {
   ];
   const iconSources = ["heart", "lock-reset", "help", "logout"];
 
-  const handleEditProfile = () => {
-    // Handle edit profile logic here
-  };
-
   const handleLeaveReview = () => {
     setReviewModalVisible(true);
   };
@@ -40,29 +46,32 @@ const ProfileScreen = ({ navigation }) => {
     navigation.navigate("PastPurchases");
   };
 
-  const handleFavoriteBusinesses = () => {
-    // Handle favorite businesses logic here
-  };
-
-  const handleChangePassword = () => {
-    // Handle change password logic here
-  };
-
-  const handleHelp = () => {
-    // Handle help logic here
-  };
-
-  const handleLogout = () => {
-    // Handle logout logic here
-  };
-
   const handleSubmitReview = () => {
     console.log("Review submitted:", reviewText);
     setReviewModalVisible(false);
   };
 
+  const handleCardPressed = (buttonText) => {
+    switch (buttonText) {
+      case "Favorite Businesses":
+        navigation.navigate("FavoriteBusinesses");
+        break;
+      case "Change Password":
+        setChangePasswordModalVisible(true);
+        break;
+      case "Help":
+        setHelpModalVisible(true);
+        break;
+      case "Logout":
+        navigation.navigate("Login");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <ScrollView style={{ marginTop: 30 }}>
+    <ScrollView>
       <LinearGradient
         colors={["#f25e35", "#ff9c6b"]}
         start={{ x: 0, y: 0.5 }}
@@ -251,7 +260,12 @@ const ProfileScreen = ({ navigation }) => {
         }}
       >
         {buttonTexts.map((buttonText, index) => (
-          <TouchableOpacity key={index}>
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              handleCardPressed(buttonText);
+            }}
+          >
             <Card
               mode="outlined"
               style={{
@@ -279,15 +293,61 @@ const ProfileScreen = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </View>
+      {/* Change Password Modal */}
+      <Portal>
+        <Modal
+          visible={isChangePasswordModalVisible}
+          onDismiss={() => setChangePasswordModalVisible(false)}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 16,
+              borderRadius: 8,
+              margin: 16,
+            }}
+          >
+            <TextInput
+              label="New Password"
+              secureTextEntry
+              style={{ marginBottom: 16 }}
+            />
+            <TextInput
+              label="Confirm Password"
+              secureTextEntry
+              style={{ marginBottom: 16 }}
+            />
+            <Button mode="contained" onPress={handleChangePassword}>
+              Change Password
+            </Button>
+          </View>
+        </Modal>
+      </Portal>
+      {/* "Help" Modal */}
+      <Portal>
+        <Modal visible={isHelpModalVisible} onDismiss={handleHelpClose}>
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 16,
+              borderRadius: 8,
+              margin: 16,
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: 200,
+            }}
+          >
+            <Text variant="titleLarge">Contact Us:</Text>
+            <Text>Email: support@example.com</Text>
+            <Text>Phone: +1 123-456-7890</Text>
+            <Button mode="contained" onPress={handleHelpClose}>
+              Close
+            </Button>
+          </View>
+        </Modal>
+      </Portal>
     </ScrollView>
   );
 };
-
-/*
-<Button title="Favorite Businesses" onPress={handleFavoriteBusinesses} />
-<Button title="Change Password" onPress={handleChangePassword} />
-<Button title="Help" onPress={handleHelp} />
-<Button title="Logout" onPress={handleLogout} />
-*/
 
 export default ProfileScreen;
