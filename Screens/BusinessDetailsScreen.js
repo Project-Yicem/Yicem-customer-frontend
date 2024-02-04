@@ -12,6 +12,7 @@ import {
   Portal,
   RadioButton,
   Dialog,
+  TextInput,
 } from "react-native-paper";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
@@ -21,6 +22,8 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [dialogVisible, setDialogVisible] = React.useState(false);
   const [checked, setChecked] = React.useState("");
+  const [reportText, setReportText] = React.useState("");
+  const [reportModalVisible, setReportModalVisible] = React.useState(false);
 
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
@@ -30,6 +33,18 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     hideModal();
   };
   const hideDialog = () => setDialogVisible(false);
+
+  const handleReport = () => {
+    // Logic for handling the report button press
+    // For now, just log a message to the console
+    console.log("Report button pressed");
+    // You can show the modal for reporting here
+    setReportModalVisible(true);
+  };
+
+  const navigateToReviews = () => {
+    navigation.navigate("Reviews", { business });
+  };
 
   return (
     <ScrollView>
@@ -92,7 +107,12 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
               <Paragraph style={{ color: "white" }}>
                 {business.rating}
               </Paragraph>
-              <Button mode="text" compact textColor="#ffe6a3">
+              <Button
+                mode="text"
+                compact
+                textColor="#ffe6a3"
+                onPress={navigateToReviews}
+              >
                 View Reviews
               </Button>
             </View>
@@ -115,7 +135,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                     color="white"
                   />
                 )}
-                onPress={() => console.log("Report")}
+                onPress={handleReport}
                 mode="contained"
                 buttonColor="#f2b149"
               >
@@ -137,6 +157,39 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
         </View>
       </LinearGradient>
       <View style={{ padding: 16 }}>
+        <Portal>
+          <Modal
+            visible={reportModalVisible}
+            onDismiss={() => {
+              setReportModalVisible(false);
+              setReportText("");
+            }}
+            contentContainerStyle={containerStyle}
+          >
+            <Title>Report Business</Title>
+            {/* Add your form elements for reporting */}
+            {/* For example, you can include text inputs, checkboxes, etc. */}
+            <Paragraph>
+              Did you have any problems with this place? Let us know!
+            </Paragraph>
+            <TextInput
+              label="Report Details"
+              value={reportText}
+              multiline
+              numberOfLines={4} // You can adjust the number of lines as needed
+              onChangeText={(text) => setReportText(text)}
+              style={{ marginBottom: 16 }}
+            />
+            <Button
+              mode="contained"
+              onPress={() => {
+                setReportModalVisible(false);
+              }}
+            >
+              Submit Report
+            </Button>
+          </Modal>
+        </Portal>
         <Portal>
           <Modal
             visible={modalVisible}
@@ -173,7 +226,6 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             </Button>
           </Modal>
         </Portal>
-
         <Portal>
           <Dialog visible={dialogVisible} onDismiss={hideDialog}>
             <Dialog.Content>

@@ -13,6 +13,7 @@ import MainTabs from "./Components/MainTabs";
 import MapScreen from "./Screens/MapScreen";
 import PastPurchasesScreen from "./Screens/PastPurchasesScreen";
 import FavoriteBusinessesScreen from "./Screens/FavoriteBusinessesScreen";
+import ReviewsScreen from "./Screens/ReviewsScreen";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
             name="FavoriteBusinesses"
             component={FavoriteBusinessesScreen}
           />
+          <Stack.Screen name="Reviews" component={ReviewsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
