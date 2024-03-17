@@ -262,6 +262,11 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                     <Text>{offer.name}</Text>
                     <Text>{offer.price}</Text>
                   </Card.Content>
+                  <Card.Content>
+                    <Paragraph style={{ fontStyle: "italic" }}>
+                      {offer.details}
+                    </Paragraph>
+                  </Card.Content>
                 </Card>
               </TouchableOpacity>
             ))

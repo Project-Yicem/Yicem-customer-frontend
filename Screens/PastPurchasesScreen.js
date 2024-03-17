@@ -1,4 +1,3 @@
-// PastPurchasesScreen.js
 import React, { useState } from "react";
 import { View, ScrollView } from "react-native";
 import {
@@ -10,16 +9,21 @@ import {
   TextInput,
   Appbar,
 } from "react-native-paper";
+import { AirbnbRating } from "react-native-ratings"; // Import the AirbnbRating component
 import recentPurchases from "../DataFiles/recentPurchases.js"; // Import the past purchases data
 
 const PastPurchasesScreen = ({ navigation }) => {
   const [isReviewModalVisible, setReviewModalVisible] = useState(false);
   const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(0); // State for the star rating
+
   const handleLeaveReview = () => {
     setReviewModalVisible(true);
   };
+
   const handleSubmitReview = () => {
     console.log("Review submitted:", reviewText);
+    console.log("Rating submitted:", rating);
     setReviewModalVisible(false);
   };
 
@@ -94,10 +98,18 @@ const PastPurchasesScreen = ({ navigation }) => {
                         <TextInput
                           label="Write your review"
                           multiline
-                          numberOfLines={8} // Adjust the number of lines
+                          numberOfLines={6} // Adjust the number of lines
                           maxLength={240} // Set the character limit
                           value={reviewText}
                           onChangeText={(text) => setReviewText(text)}
+                        />
+                        <AirbnbRating
+                          count={5}
+                          defaultRating={0}
+                          size={24}
+                          showRating={false}
+                          onFinishRating={(value) => setRating(value)}
+                          style={{ marginTop: 16 }}
                         />
                         <Button
                           mode="contained"

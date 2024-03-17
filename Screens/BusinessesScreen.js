@@ -15,7 +15,7 @@ const BusinessesScreen = ({ navigation }) => {
   );
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <LinearGradient
         colors={["#ff8069", "rgba(0,0,0,0)"]}
         locations={[0, 0.5]} // Adjust the values based on your preference

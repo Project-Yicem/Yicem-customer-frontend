@@ -37,6 +37,12 @@ const styles = StyleSheet.create({
     margin: 16,
     marginBottom: 12,
   },
+  carouselCard: {
+    margin: 16,
+    marginTop: 20,
+    justifyContent: "center",
+    backgroundColor: "#ff816b",
+  },
 });
 
 export const theme = {
