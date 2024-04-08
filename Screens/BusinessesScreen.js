@@ -1,18 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView } from "react-native";
 import { Searchbar, Card, Title, Paragraph } from "react-native-paper";
 import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
-
+import axios from "axios";
 import businessesData from "../DataFiles/businessesData.js";
 
 const BusinessesScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [businesses, setBusinesses] = useState([]);
+  const [filteredBusinesses, setFilteredBusinesses] = useState([]);
 
-  const filteredBusinesses = businessesData.filter((business) =>
-    business.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchBusinesses = async () => {
+      try {
+        const response = await axios.get("http://192.168.1.15:3000/businesses");
+        setBusinesses(response.data);
+      } catch (error) {
+        console.error("Error fetching businesses data:", error);
+      }
+    };
+
+    fetchBusinesses();
+  }, []);
+
+  useEffect(() => {
+    setFilteredBusinesses(
+      businesses.filter((business) =>
+        business.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [businesses, searchQuery]);
 
   return (
     <View style={{ flex: 1 }}>

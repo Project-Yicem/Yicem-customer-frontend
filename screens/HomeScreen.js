@@ -1,35 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
-import { Text, Card, Title, Paragraph, Button } from "react-native-paper";
+import {
+  Text,
+  Card,
+  Title,
+  Paragraph,
+  Button,
+  ActivityIndicator,
+} from "react-native-paper";
 import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
-
+import axios from "axios";
 import businessesData from "../DataFiles/businessesData.js";
 
 const HomeScreen = ({ navigation }) => {
-  // Filter businesses based on distance
-  const businesses = businessesData.filter(
-    (business) => parseInt(business.distance) < 500
-  );
+  const [businesses, setBusinesses] = useState([]);
+  const [activeReservations, setActiveReservations] = useState([]);
+  const [isLoadingBusinesses, setIsLoadingBusinesses] = useState(true);
+  const [isLoadingActiveReservations, setIsLoadingActiveReservations] =
+    useState(true);
 
-  const [activeReservations, setActiveReservations] = useState([
-    {
-      id: 1,
-      cafeName: "Cafe Velocity",
-      itemTitle: "Box 1",
-      price: "$4.50",
-      pickupTime: "12:00 - 13.00 PM",
-    },
-    {
-      id: 2,
-      cafeName: "Beethoven Cafe",
-      itemTitle: "Box 2",
-      price: "$3.50",
-      pickupTime: "1:00 - 2.00 PM",
-    },
-  ]);
+  const fetchBusinesses = async () => {
+    try {
+      const response = await axios.get("http://192.168.1.15:3000/businesses");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching businesses data:", error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  };
+
+  const fetchActiveReservations = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.15:3000/active-reservations"
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching active reservations data:", error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  };
+
+  useEffect(() => {
+    const loadBusinesses = async () => {
+      try {
+        const allBusinesses = await fetchBusinesses();
+        // Filter businesses to only show those within 500 meters
+        const filteredBusinesses = allBusinesses.filter(
+          (business) => parseInt(business.distance) < 500
+        );
+        setTimeout(() => {
+          setBusinesses(filteredBusinesses);
+          setIsLoadingBusinesses(false);
+        }, 2000);
+      } catch (error) {
+        console.error("Failed to load businesses:", error);
+      }
+    };
+    const loadActiveReservations = async () => {
+      try {
+        const allActiveReservations = await fetchActiveReservations();
+        setTimeout(() => {
+          setActiveReservations(allActiveReservations);
+          setIsLoadingActiveReservations(false);
+        }, 1500);
+      } catch (error) {
+        console.error("Failed to load active reservations:", error);
+      }
+    };
+
+    loadBusinesses();
+    loadActiveReservations();
+  }, []);
+
   const [activeSlide, setActiveSlide] = useState(0);
 
   return (
@@ -45,12 +91,10 @@ const HomeScreen = ({ navigation }) => {
           Your active reservations
         </Text>
       </LinearGradient>
-      {activeReservations.length === 0 ? (
-        <Text
-          style={{ marginTop: "5%", marginLeft: "5%", fontStyle: "italic" }}
-        >
-          You have no active reservations right now
-        </Text>
+      {isLoadingActiveReservations ? (
+        <ActivityIndicator animating={true} color={theme.colors.primary} />
+      ) : activeReservations.length === 0 ? (
+        <Text style={{ margin: "5%" }}>No active reservations</Text>
       ) : (
         <View>
           <>
@@ -98,53 +142,61 @@ const HomeScreen = ({ navigation }) => {
         Offers Near You
       </Text>
       <ScrollView>
-        {businesses.map((business) => (
-          <TouchableOpacity
-            key={business.id}
-            onPress={() =>
-              navigation.navigate("BusinessDetailsScreen", { business })
-            }
-          >
-            <Card
-              mode="contained"
+        {isLoadingBusinesses ? (
+          <ActivityIndicator animating={true} color={theme.colors.primary} />
+        ) : businesses.length === 0 ? (
+          <Text style={{ margin: "5%" }}>No businesses found</Text>
+        ) : (
+          businesses.map((business) => (
+            <TouchableOpacity
               key={business.id}
-              style={styles.businessCard}
+              onPress={() =>
+                navigation.navigate("BusinessDetailsScreen", { business })
+              }
             >
-              <LinearGradient
-                colors={
-                  business.isOpen
-                    ? business.availableOffers
-                      ? ["#f23545", "#ff9c6b"] // Open with offers: red to orange gradient
-                      : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"] // Open without offers: semi-transparent red to orange gradient
-                    : ["#808080", "#ffffff"] // Closed: gray to white gradient
-                }
-                start={{ x: 0, y: 0.5 }} // left-to-right
-                end={{ x: 1, y: 0.5 }} // left-to-right
-                style={{ borderRadius: 8, padding: 6 }}
+              <Card
+                mode="contained"
+                key={business.id}
+                style={styles.businessCard}
               >
-                <Card.Content
-                  style={{ flexDirection: "row", alignItems: "center" }}
+                <LinearGradient
+                  colors={
+                    business.isOpen
+                      ? business.availableOffers
+                        ? ["#f23545", "#ff9c6b"] // Open with offers: red to orange gradient
+                        : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"] // Open without offers: semi-transparent red to orange gradient
+                      : ["#808080", "#ffffff"] // Closed: gray to white gradient
+                  }
+                  start={{ x: 0, y: 0.5 }} // left-to-right
+                  end={{ x: 1, y: 0.5 }} // left-to-right
+                  style={{ borderRadius: 8, padding: 6 }}
                 >
-                  <View style={{ flex: 1 }}>
-                    <Title style={{ color: "white" }}>{business.name}</Title>
-                    <Paragraph style={{ color: "white" }}>
-                      {business.isOpen
-                        ? business.availableOffers
-                          ? "Open"
-                          : "No offers available right now"
-                        : "Closed: Opens at " + business.openingTime}
-                    </Paragraph>
-                    <Text style={{ color: "white" }}>{business.distance}</Text>
-                  </View>
-                  <Card.Cover
-                    source={business.logo}
-                    style={{ width: 50, height: 50 }}
-                  />
-                </Card.Content>
-              </LinearGradient>
-            </Card>
-          </TouchableOpacity>
-        ))}
+                  <Card.Content
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Title style={{ color: "white" }}>{business.name}</Title>
+                      <Paragraph style={{ color: "white" }}>
+                        {business.isOpen
+                          ? business.availableOffers
+                            ? "Open"
+                            : "No offers available right now"
+                          : "Closed: Opens at " + business.openingTime}
+                      </Paragraph>
+                      <Text style={{ color: "white" }}>
+                        {business.distance}
+                      </Text>
+                    </View>
+                    <Card.Cover
+                      source={business.logo}
+                      style={{ width: 50, height: 50 }}
+                    />
+                  </Card.Content>
+                </LinearGradient>
+              </Card>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </View>
   );

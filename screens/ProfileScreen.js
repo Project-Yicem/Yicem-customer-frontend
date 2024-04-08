@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import {
   Button,
@@ -10,9 +10,10 @@ import {
   Modal,
   Portal,
   TextInput,
+  ActivityIndicator,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
-import recentPurchases from "../DataFiles/recentPurchases.js";
+import axios from "axios";
 
 const ProfileScreen = ({ navigation }) => {
   const [name, setName] = useState("John Doe");
@@ -22,6 +23,8 @@ const ProfileScreen = ({ navigation }) => {
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] =
     useState(false);
   const [isHelpModalVisible, setHelpModalVisible] = useState(false);
+  const [recentPurchases, setRecentPurchases] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleChangePassword = () => {
     setChangePasswordModalVisible(false);
@@ -29,6 +32,34 @@ const ProfileScreen = ({ navigation }) => {
   const handleHelpClose = () => {
     setHelpModalVisible(false);
   };
+
+  const fetchRecentPurchases = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.1.15:3000/recent-purchases"
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching businesses data:", error);
+      throw error; // Rethrow the error to be handled by the caller
+    }
+  };
+
+  useEffect(() => {
+    const loadRecentPurchases = async () => {
+      try {
+        setTimeout(async () => {
+          const allRecentPurchases = await fetchRecentPurchases();
+          setRecentPurchases(allRecentPurchases);
+          setIsLoading(false);
+        }, 2000);
+      } catch (error) {
+        console.error("Failed to load recent purchases:", error);
+      }
+    };
+
+    loadRecentPurchases();
+  }, []);
 
   const buttonTexts = [
     "Favorite Businesses",
@@ -82,7 +113,7 @@ const ProfileScreen = ({ navigation }) => {
             flexDirection: "column",
             justifyContent: "space-between",
             padding: 16,
-            marginTop: 8,
+            marginTop: 24,
           }}
         >
           <Card
@@ -160,84 +191,106 @@ const ProfileScreen = ({ navigation }) => {
                 justifyContent: "space-between",
               }}
             >
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text variant="titleLarge">{recentPurchases[0].cafeName}</Text>
+              {isLoading ? (
                 <View
                   style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
                 >
-                  <Text style={{ marginTop: 7 }} variant="bodyLarge">
-                    {recentPurchases[0].itemTitle}
-                  </Text>
+                  <ActivityIndicator
+                    animating={true}
+                    color="#f2b149"
+                    size="large"
+                  />
                 </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={{ color: "gray" }}>
-                    {recentPurchases[0].date}
-                  </Text>
-                  <Text style={{ marginLeft: 10, color: "gray" }}>
-                    {recentPurchases[0].price}
-                  </Text>
-                  <Portal>
-                    <Modal
-                      visible={isReviewModalVisible}
-                      onDismiss={() => setReviewModalVisible(false)}
+              ) : recentPurchases.length > 0 ? (
+                <>
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Text variant="titleLarge">
+                      {recentPurchases[0].cafeName}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
                     >
-                      <View
-                        style={{
-                          backgroundColor: "white",
-                          padding: 16,
-                          borderRadius: 8,
-                          margin: 16,
-                        }}
-                      >
-                        <TextInput
-                          label="Write your review"
-                          multiline
-                          numberOfLines={8} // Adjust the number of lines
-                          maxLength={240} // Set the character limit
-                          value={reviewText}
-                          onChangeText={(text) => setReviewText(text)}
-                        />
-                        <Button
-                          mode="contained"
-                          onPress={handleSubmitReview}
-                          style={{ marginTop: 16 }}
+                      <Text style={{ marginTop: 7 }} variant="bodyLarge">
+                        {recentPurchases[0].itemTitle}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text style={{ color: "gray" }}>
+                        {recentPurchases[0].date}
+                      </Text>
+                      <Text style={{ marginLeft: 10, color: "gray" }}>
+                        {recentPurchases[0].price}
+                      </Text>
+                      <Portal>
+                        <Modal
+                          visible={isReviewModalVisible}
+                          onDismiss={() => setReviewModalVisible(false)}
                         >
-                          Submit Review
-                        </Button>
-                      </View>
-                    </Modal>
-                  </Portal>
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <Button
-                  style={{ marginLeft: 20 }}
-                  mode="contained"
-                  title="Leave a Review"
-                  compact="true"
-                  onPress={handleLeaveReview}
-                >
-                  Leave a Review
-                </Button>
-              </View>
+                          <View
+                            style={{
+                              backgroundColor: "white",
+                              padding: 16,
+                              borderRadius: 8,
+                              margin: 16,
+                            }}
+                          >
+                            <TextInput
+                              label="Write your review"
+                              multiline
+                              numberOfLines={8} // Adjust the number of lines
+                              maxLength={240} // Set the character limit
+                              value={reviewText}
+                              onChangeText={(text) => setReviewText(text)}
+                            />
+                            <Button
+                              mode="contained"
+                              onPress={handleSubmitReview}
+                              style={{ marginTop: 16 }}
+                            >
+                              Submit Review
+                            </Button>
+                          </View>
+                        </Modal>
+                      </Portal>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      style={{ marginLeft: 20 }}
+                      mode="contained"
+                      title="Leave a Review"
+                      compact="true"
+                      onPress={handleLeaveReview}
+                    >
+                      Leave a Review
+                    </Button>
+                  </View>
+                </>
+              ) : (
+                <Text>No recent purchases found.</Text>
+              )}
             </Card.Content>
           </Card>
           <Button

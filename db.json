@@ -1,0 +1,184 @@
+{
+  "businesses": [
+    {
+      "id": 1,
+      "name": "Velocity Cafe",
+      "logo": "require(\"../assets/businesslogos/logo_bakery.png\")",
+      "isOpen": true,
+      "availableOffers": true,
+      "openingTime": "10:00",
+      "closingTime": "20:00",
+      "distance": "300m",
+      "rating": "4.5",
+      "address": "Bilkent A Building, 1st floor",
+      "latitude": 39.86613476149862,
+      "longitude": 32.74841331751553,
+      "offers": [
+        {
+          "name": "Savory Box",
+          "price": "45 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Sweet Box",
+          "price": "75 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Pastry Box",
+          "price": "55 ₺",
+          "details": "May include these items (items will be listed here...)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Beethoven Cafe",
+      "logo": "require(\"../assets/businesslogos/logo_coffee.png\")",
+      "isOpen": true,
+      "availableOffers": true,
+      "openingTime": "10:00",
+      "closingTime": "20:00",
+      "distance": "350m",
+      "rating": "4.0",
+      "address": "Bilkent B Building, 2nd floor",
+      "latitude": 39.86883769578915,
+      "longitude": 32.74804230022964,
+      "offers": [
+        {
+          "name": "Savory Box",
+          "price": "45 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Sweet Box",
+          "price": "75 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Pastry Box",
+          "price": "55 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Exclusive Box",
+          "price": "100 ₺",
+          "details": "May include these items (items will be listed here...)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Cafe Fiery",
+      "logo": "require(\"../assets/businesslogos/logo_F.jpeg\")",
+      "isOpen": true,
+      "availableOffers": true,
+      "openingTime": "10:00",
+      "closingTime": "20:00",
+      "distance": "700m",
+      "rating": "4.2",
+      "address": "Bilkent M Building, 3rd floor",
+      "latitude": 39.866477179576485,
+      "longitude": 32.74918382453541,
+      "offers": [
+        {
+          "name": "Savory Box",
+          "price": "45 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Sweet Box",
+          "price": "75 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Pastry Box",
+          "price": "55 ₺",
+          "details": "May include these items (items will be listed here...)"
+        },
+        {
+          "name": "Very Secret Box",
+          "price": "200 ₺"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Rooftop Restaurant",
+      "logo": "require(\"../assets/businesslogos/logo_salad.png\")",
+      "isOpen": true,
+      "availableOffers": false,
+      "openingTime": "10:00",
+      "closingTime": "20:00",
+      "distance": "400m",
+      "rating": "4.8",
+      "address": "Bilkent C Building, 4th floor",
+      "latitude": 39.867819957719306,
+      "longitude": 32.74816290905867,
+      "offers": []
+    },
+    {
+      "id": 5,
+      "name": "Tea Break",
+      "logo": "require(\"../assets/businesslogos/logo_tea.jpeg\")",
+      "isOpen": false,
+      "availableOffers": true,
+      "openingTime": "10:00",
+      "closingTime": "20:00",
+      "distance": "600m",
+      "rating": "4.1",
+      "address": "Bilkent SA Building, 1st floor",
+      "latitude": 39.86828221142914,
+      "longitude": 32.74911772286561,
+      "offers": [
+        {
+          "name": "Savory Box",
+          "price": "45 ₺",
+          "details": "May include these items (items will be listed here...)"
+        }
+      ]
+    }
+  ],
+  "recent-purchases": [
+    {
+      "cafeName": "Coffee House",
+      "itemTitle": "Box 1",
+      "price": "20 TL",
+      "date": "01/12/2023"
+    },
+    {
+      "cafeName": "Tea Time",
+      "itemTitle": "Box 2",
+      "price": "18 TL",
+      "date": "25/11/2023"
+    },
+    {
+      "cafeName": "Smoothie Bar",
+      "itemTitle": "Box 1",
+      "price": "30 TL",
+      "date": "20/11/2023"
+    },
+    {
+      "cafeName": "Bakery Delights",
+      "itemTitle": "Box 4",
+      "price": "12 TL",
+      "date": "15/11/2023"
+    }
+  ],
+  "active-reservations": [
+    {
+      "id": 1,
+      "cafeName": "Cafe Velocity",
+      "itemTitle": "Box 1",
+      "price": "$4.50",
+      "pickupTime": "12:00 - 13.00 PM"
+    },
+    {
+      "id": 2,
+      "cafeName": "Beethoven Cafe",
+      "itemTitle": "Box 2",
+      "price": "$3.50",
+      "pickupTime": "1:00 - 2.00 PM"
+    }
+  ]
+}

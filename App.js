@@ -34,7 +34,7 @@ export default function App() {
             component={BusinessDetailsScreen}
           />
           <Stack.Screen name="MainHome" component={MainTabs} />
-          <Stack.Screen name="Map" component={MapScreen} />
+          {/**<Stack.Screen name="Map" component={MapScreen} />**/}
           <Stack.Screen name="PastPurchases" component={PastPurchasesScreen} />
           <Stack.Screen
             name="FavoriteBusinesses"
