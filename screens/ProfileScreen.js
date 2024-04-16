@@ -35,9 +35,7 @@ const ProfileScreen = ({ navigation }) => {
 
   const fetchRecentPurchases = async () => {
     try {
-      const response = await axios.get(
-        "http://192.168.1.15:3000/recent-purchases"
-      );
+      const response = await axios.get("http://10.0.2.2:3000/recent-purchases");
       return response.data;
     } catch (error) {
       console.error("Error fetching businesses data:", error);

@@ -24,7 +24,7 @@ const HomeScreen = ({ navigation }) => {
 
   const fetchBusinesses = async () => {
     try {
-      const response = await axios.get("http://192.168.1.15:3000/businesses");
+      const response = await axios.get("http://10.0.2.2:3000/businesses");
       return response.data;
     } catch (error) {
       console.error("Error fetching businesses data:", error);
@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
   const fetchActiveReservations = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.1.15:3000/active-reservations"
+        "http://10.0.2.2:3000/active-reservations"
       );
       return response.data;
     } catch (error) {
