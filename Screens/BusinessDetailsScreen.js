@@ -71,10 +71,11 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
         >
           <View style={{ flex: 1 }}>
             <Text style={{ color: "white" }} variant="headlineMedium">
-              {business.name}
+              {business.businessName}
             </Text>
             <Paragraph style={{ color: "white" }}>
-              Open hours: {business.openingTime} to {business.closingTime}
+              {/**TODO update this when the opening-closing time logic changes*/}
+              Open hours: {business.workingHours}
             </Paragraph>
             <View
               style={{

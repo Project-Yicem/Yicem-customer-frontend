@@ -32,9 +32,6 @@ function AppContent() {
   const navigation = useNavigation();
 
   const checkToken = async () => {
-    // (if needed, uncomment this to delete token)
-    // await SecureStore.deleteItemAsync("userToken");
-
     // Check if the user is already logged in
     // If so, navigate to the MainHome screen
     // If not, navigate to the Login screen

@@ -1,34 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView } from "react-native";
-import { Searchbar, Card, Title, Paragraph } from "react-native-paper";
+import { View, ScrollView, RefreshControl } from "react-native";
+import {
+  Searchbar,
+  Card,
+  Title,
+  Paragraph,
+  ActivityIndicator,
+} from "react-native-paper";
 import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native";
 import axios from "axios";
 import businessesData from "../DataFiles/businessesData.js";
+import { IP_ADDRESS } from "../Functions/GetIP.js";
 
 const BusinessesScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [businesses, setBusinesses] = useState([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState([]);
+  const [isBusinessesLoading, setIsBusinessesLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchBusinesses = async () => {
+    try {
+      setIsBusinessesLoading(true);
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/view-businesses`;
+      const response = await axios.get(apiUrl);
+      console.log("Businesses data fetched in BusinessesScreen");
+      setIsBusinessesLoading(false);
+
+      // Add an arbitrary "isOpen" attribute to each business
+      // TODO This is temporary!!! This should be handled by the backend
+      const updatedBusinesses = response.data.map((business) => {
+        business.isOpen = true;
+        return business;
+      });
+      setBusinesses(updatedBusinesses);
+    } catch (error) {
+      console.error("Error fetching businesses data:", error);
+      setIsBusinessesLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBusinesses = async () => {
-      try {
-        const response = await axios.get("http://192.168.1.15:3000/businesses");
-        setBusinesses(response.data);
-      } catch (error) {
-        console.error("Error fetching businesses data:", error);
-      }
-    };
-
     fetchBusinesses();
   }, []);
 
   useEffect(() => {
+    if (!searchQuery) {
+      setFilteredBusinesses(businesses);
+      return;
+    }
     setFilteredBusinesses(
       businesses.filter((business) =>
-        business.name.toLowerCase().includes(searchQuery.toLowerCase())
+        business.businessName.toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
   }, [businesses, searchQuery]);
@@ -46,54 +71,74 @@ const BusinessesScreen = ({ navigation }) => {
           style={styles.searchBar}
         />
       </LinearGradient>
-      <ScrollView>
-        {filteredBusinesses.map((business) => (
-          <TouchableOpacity
-            key={business.id}
-            onPress={() =>
-              navigation.navigate("BusinessDetailsScreen", { business })
-            }
-          >
-            <Card
-              mode="contained"
+      {isBusinessesLoading && (
+        <ActivityIndicator
+          animating={true}
+          color={theme.colors.primary}
+          style={{ marginTop: "20%" }}
+        />
+      )}
+      {!isBusinessesLoading && (
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchBusinesses()}
+            />
+          }
+        >
+          {filteredBusinesses.map((business) => (
+            <TouchableOpacity
               key={business.id}
-              style={styles.businessCard}
+              onPress={() =>
+                navigation.navigate("BusinessDetailsScreen", { business })
+              }
             >
-              <LinearGradient
-                colors={
-                  business.isOpen
-                    ? business.availableOffers
-                      ? ["#f23545", "#ff9c6b"]
-                      : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"]
-                    : ["#808080", "#ffffff"]
-                }
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={{ borderRadius: 8, padding: 6 }}
+              <Card
+                mode="contained"
+                key={business.id}
+                style={styles.businessCard}
               >
-                <Card.Content
-                  style={{ flexDirection: "row", alignItems: "center" }}
+                <LinearGradient
+                  colors={
+                    business.isOpen
+                      ? business.currentOffers &&
+                        business.currentOffers.length > 0
+                        ? ["#f23545", "#ff9c6b"]
+                        : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"]
+                      : ["#808080", "#ffffff"]
+                  }
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={{ borderRadius: 8, padding: 6 }}
                 >
-                  <View style={{ flex: 1 }}>
-                    <Title style={{ color: "white" }}>{business.name}</Title>
-                    <Paragraph style={{ color: "white" }}>
-                      {business.isOpen
-                        ? business.availableOffers
-                          ? "Open"
-                          : "No offers available right now"
-                        : "Closed: Opens at " + business.openingTime}
-                    </Paragraph>
-                  </View>
-                  <Card.Cover
-                    source={business.logo}
-                    style={{ width: 50, height: 50 }}
-                  />
-                </Card.Content>
-              </LinearGradient>
-            </Card>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+                  <Card.Content
+                    style={{ flexDirection: "row", alignItems: "center" }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Title style={{ color: "white" }}>
+                        {business.businessName}
+                      </Title>
+                      <Paragraph style={{ color: "white" }}>
+                        {business.isOpen
+                          ? business.currentOffers &&
+                            business.currentOffers.length > 0
+                            ? "Open"
+                            : "No offers available right now"
+                          : "Closed: Opens at " + business.openingTime}
+                      </Paragraph>
+                    </View>
+                    <Card.Cover
+                      source={business.logo}
+                      style={{ width: 50, height: 50 }}
+                    />
+                  </Card.Content>
+                </LinearGradient>
+              </Card>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
