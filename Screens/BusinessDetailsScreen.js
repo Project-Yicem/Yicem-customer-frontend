@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Image, TouchableOpacity, ScrollView } from "react-native";
 import {
   Text,
@@ -13,17 +13,24 @@ import {
   RadioButton,
   Dialog,
   TextInput,
+  ActivityIndicator,
 } from "react-native-paper";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
+import axios from "axios";
+import { IP_ADDRESS } from "../Functions/GetIP";
+import * as SecureStore from "expo-secure-store";
 
 const BusinessDetailsScreen = ({ navigation, route }) => {
   const containerStyle = { backgroundColor: "white", padding: 20 };
   const { business } = route.params;
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [dialogVisible, setDialogVisible] = React.useState(false);
-  const [checked, setChecked] = React.useState("");
-  const [reportText, setReportText] = React.useState("");
-  const [reportModalVisible, setReportModalVisible] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [checked, setChecked] = useState("");
+  const [reportText, setReportText] = useState("");
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [offers, setOffers] = useState();
+  const [isOffersLoading, setIsOffersLoading] = useState(false);
 
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
@@ -45,6 +52,60 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   const navigateToReviews = () => {
     navigation.navigate("Reviews", { business });
   };
+
+  const isBusinessInFavorites = async () => {
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/favorites`;
+    // Include user token in the request headers
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const headers = {
+      Authorization: `Bearer ${userToken}`,
+    };
+    try {
+      const response = await axios.get(apiUrl, { headers });
+      const favoriteBusinesses = response.data;
+      if (favoriteBusinesses.length === 0) {
+        console.log("No favorite businesses found");
+        return false;
+      }
+      return favoriteBusinesses.some(
+        (favoriteBusiness) => favoriteBusiness.id === business.id
+      );
+    } catch (error) {
+      console.error("Error fetching favorite businesses:", error);
+      return false;
+    }
+  };
+
+  const fetchOffers = async () => {
+    if (!business.currentOffers) {
+      setOffers([]);
+      return;
+    }
+    setIsOffersLoading(true);
+    // Include user token in the request headers
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const headers = {
+      Authorization: `Bearer ${userToken}`,
+    };
+    try {
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/business/${business.id}/offers`;
+      const response = await axios.get(apiUrl, { headers });
+      setOffers(response.data);
+      console.log(
+        "Offers data fetched in BusinessDetailsScreen",
+        response.data
+      );
+      setIsOffersLoading(false);
+    } catch (error) {
+      console.error("Error fetching offers data:", error);
+      setIsOffersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setIsFavorite(isBusinessInFavorites());
+    fetchOffers();
+  }, []);
 
   return (
     <ScrollView>
@@ -106,7 +167,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 style={{ marginRight: 4, color: "white" }}
               />
               <Paragraph style={{ color: "white" }}>
-                {business.rating}
+                {business.rating ? business.rating : "No ratings yet"}
               </Paragraph>
               <Button
                 mode="text"
@@ -115,32 +176,6 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 onPress={navigateToReviews}
               >
                 View Reviews
-              </Button>
-            </View>
-            <View style={{ flexDirection: "row", marginTop: 16 }}>
-              <FontAwesome5Icon
-                name="heart"
-                size={20}
-                style={{ marginRight: 4, color: "white" }}
-              />
-              <Paragraph style={{ color: "white" }}>
-                Add to your favorites
-              </Paragraph>
-            </View>
-            <View style={{ flexDirection: "row", marginTop: 16 }}>
-              <Button
-                icon={() => (
-                  <FontAwesome5Icon
-                    name="exclamation-triangle"
-                    size={20}
-                    color="white"
-                  />
-                )}
-                onPress={handleReport}
-                mode="contained"
-                buttonColor="#f2b149"
-              >
-                <Text>Report</Text>
               </Button>
             </View>
           </View>
@@ -156,6 +191,39 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             />
           </View>
         </View>
+        <View style={{ flexDirection: "row", marginTop: 4, padding: 10 }}>
+          <View style={{ flex: 1, marginBottom: 8 }}>
+            <Button
+              icon={() => (
+                <FontAwesome5Icon
+                  name="heart"
+                  size={20}
+                  style={{ marginRight: 4, color: "white" }}
+                />
+              )}
+              mode="contained"
+              buttonColor="#ffa099"
+            >
+              <Text>Add to favorites</Text>
+            </Button>
+          </View>
+          <View style={{ flex: 1, marginLeft: 8 }}>
+            <Button
+              icon={() => (
+                <FontAwesome5Icon
+                  name="exclamation-triangle"
+                  size={20}
+                  color="white"
+                />
+              )}
+              onPress={handleReport}
+              mode="contained"
+              buttonColor="#f2b149"
+            >
+              <Text>Report</Text>
+            </Button>
+          </View>
+        </View>
       </LinearGradient>
       <View style={{ padding: 16 }}>
         <Portal>
@@ -168,8 +236,6 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             contentContainerStyle={containerStyle}
           >
             <Title>Report Business</Title>
-            {/* Add your form elements for reporting */}
-            {/* For example, you can include text inputs, checkboxes, etc. */}
             <Paragraph>
               Did you have any problems with this place? Let us know!
             </Paragraph>
@@ -241,46 +307,56 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
           </Dialog>
         </Portal>
         <Title>Available Offers</Title>
-        {business.isOpen ? (
-          Array.isArray(business.offers) && business.offers.length > 0 ? (
-            business.offers.map((offer, index) => (
-              <TouchableOpacity key={index} onPress={showModal}>
-                <Card
-                  mode="outlined"
-                  style={{
-                    marginBottom: 12,
-                    borderColor: "#f2b149",
-                    borderWidth: 1,
-                    borderRadius: 8,
-                  }}
-                >
-                  <Card.Content
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text>{offer.name}</Text>
-                    <Text>{offer.price}</Text>
-                  </Card.Content>
-                  <Card.Content>
-                    <Paragraph style={{ fontStyle: "italic" }}>
-                      {offer.details}
-                    </Paragraph>
-                  </Card.Content>
-                </Card>
-              </TouchableOpacity>
-            ))
+        {isOffersLoading && (
+          <ActivityIndicator
+            animating={true}
+            color="#f2b149"
+            style={{ marginTop: 20 }}
+          />
+        )}
+        {!isOffersLoading &&
+          (business.isOpen ? (
+            Array.isArray(offers) && offers.length > 0 ? (
+              offers.map((offer, index) => {
+                return offer.itemCount > 0 ? (
+                  <TouchableOpacity key={index} onPress={showModal}>
+                    <Card
+                      mode="outlined"
+                      style={{
+                        marginBottom: 12,
+                        borderColor: "#f2b149",
+                        borderWidth: 1,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Card.Content
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Text>{offer.offerName}</Text>
+                        <Text>₺{offer.price}</Text>
+                      </Card.Content>
+                      <Card.Content>
+                        <Paragraph style={{ fontStyle: "italic" }}>
+                          {offer.description}
+                        </Paragraph>
+                      </Card.Content>
+                    </Card>
+                  </TouchableOpacity>
+                ) : null;
+              })
+            ) : (
+              <Paragraph style={{ fontStyle: "italic" }}>
+                No offers available right now.
+              </Paragraph>
+            )
           ) : (
             <Paragraph style={{ fontStyle: "italic" }}>
-              No offers available right now.
+              Business is closed, come back later.
             </Paragraph>
-          )
-        ) : (
-          <Paragraph style={{ fontStyle: "italic" }}>
-            Business is closed, come back later.
-          </Paragraph>
-        )}
+          ))}
       </View>
     </ScrollView>
   );
