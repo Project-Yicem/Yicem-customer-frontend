@@ -33,9 +33,14 @@ export default function LoginScreen({ navigation }) {
       });
 
       const token = response.data.token;
-
-      // Store the token using expo-secure-store
+      const userInfo = {
+        username: response.data.username,
+        email: response.data.email,
+        id: response.data.id,
+      };
+      // Store the user data using expo-secure-store
       await SecureStore.setItemAsync("userToken", token);
+      await SecureStore.setItemAsync("userInfo", JSON.stringify(userInfo));
       setIsLoginLoading(false);
       navigation.navigate("MainHome");
     } catch (error) {

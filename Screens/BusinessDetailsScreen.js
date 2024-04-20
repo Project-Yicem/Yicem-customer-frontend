@@ -29,6 +29,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   const [reportText, setReportText] = useState("");
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [offers, setOffers] = useState();
   const [isOffersLoading, setIsOffersLoading] = useState(false);
 
@@ -54,6 +55,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   };
 
   const isBusinessInFavorites = async () => {
+    setIsFavoriteLoading(true);
     const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/favorites`;
     // Include user token in the request headers
     const userToken = await SecureStore.getItemAsync("userToken");
@@ -65,8 +67,10 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
       const favoriteBusinesses = response.data;
       if (favoriteBusinesses.length === 0) {
         console.log("No favorite businesses found");
+        setIsFavoriteLoading(false);
         return false;
       }
+      setIsFavoriteLoading(false);
       return favoriteBusinesses.some(
         (favoriteBusiness) => favoriteBusiness.id === business.id
       );
@@ -91,10 +95,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
       const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/business/${business.id}/offers`;
       const response = await axios.get(apiUrl, { headers });
       setOffers(response.data);
-      console.log(
-        "Offers data fetched in BusinessDetailsScreen",
-        response.data
-      );
+      console.log("Offers data fetched in BusinessDetailsScreen");
       setIsOffersLoading(false);
     } catch (error) {
       console.error("Error fetching offers data:", error);
@@ -103,9 +104,36 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    setIsFavorite(isBusinessInFavorites());
-    fetchOffers();
+    const fetchData = async () => {
+      fetchOffers();
+      const favorite = await isBusinessInFavorites();
+      setIsFavorite(favorite);
+    };
+
+    fetchData();
   }, []);
+
+  const addBusinessToFavorites = async (businessId) => {
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/favorite/${businessId}`;
+    // Include user token in the request headers
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const headers = {
+      Authorization: `Bearer ${userToken}`,
+    };
+    try {
+      if (isFavorite) {
+        // Remove business from favorites
+        // TODO implement this when the un-favorite API is handled on the backend
+      } else {
+        // Add business to favorites
+        await axios.post(apiUrl, null, { headers });
+        setIsFavorite(true);
+        console.log("Business added to favorites");
+      }
+    } catch (error) {
+      console.error("Error adding/removing business from favorites:", error);
+    }
+  };
 
   return (
     <ScrollView>
@@ -193,19 +221,30 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
         </View>
         <View style={{ flexDirection: "row", marginTop: 4, padding: 10 }}>
           <View style={{ flex: 1, marginBottom: 8 }}>
-            <Button
-              icon={() => (
-                <FontAwesome5Icon
-                  name="heart"
-                  size={20}
-                  style={{ marginRight: 4, color: "white" }}
-                />
-              )}
-              mode="contained"
-              buttonColor="#ffa099"
-            >
-              <Text>Add to favorites</Text>
-            </Button>
+            {isFavoriteLoading ? (
+              <ActivityIndicator animating={true} color="#f2b149" />
+            ) : (
+              <Button
+                icon={() => (
+                  <FontAwesome5Icon
+                    name="heart"
+                    size={20}
+                    style={{ marginRight: 4, color: "white" }}
+                  />
+                )}
+                mode="contained"
+                buttonColor={isFavorite ? "#ffa099" : "#f23545"}
+                onPress={() => {
+                  addBusinessToFavorites(business.id);
+                }}
+              >
+                {isFavorite ? (
+                  <Text style={{ color: "white" }}>Remove Favorite</Text>
+                ) : (
+                  <Text style={{ color: "white" }}>Add to Favorites</Text>
+                )}
+              </Button>
+            )}
           </View>
           <View style={{ flex: 1, marginLeft: 8 }}>
             <Button
@@ -220,7 +259,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
               mode="contained"
               buttonColor="#f2b149"
             >
-              <Text>Report</Text>
+              <Text style={{ color: "white" }}>Report</Text>
             </Button>
           </View>
         </View>

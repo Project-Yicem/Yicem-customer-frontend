@@ -15,17 +15,21 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { IP_ADDRESS } from "../Functions/GetIP";
 
 const ProfileScreen = ({ navigation }) => {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
   const [isReviewModalVisible, setReviewModalVisible] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] =
     useState(false);
   const [isHelpModalVisible, setHelpModalVisible] = useState(false);
   const [recentPurchases, setRecentPurchases] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isRecentPurchasesLoading, setIsRecentPurchasesLoading] =
+    useState(true);
+  const [userData, setUserData] = useState({});
+  const [userDataLoading, setUserDataLoading] = useState(false);
+  const [isUsernameEditable, setUsernameEditable] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
 
   const handleChangePassword = () => {
     setChangePasswordModalVisible(false);
@@ -36,28 +40,52 @@ const ProfileScreen = ({ navigation }) => {
 
   const fetchRecentPurchases = async () => {
     try {
-      const response = await axios.get("http://10.0.2.2:3000/recent-purchases");
-      return response.data;
+      setIsRecentPurchasesLoading(true);
+      // TODO implement this when the purchase function is working correctly
+      //const response = await axios.get("http://10.0.2.2:3000/recent-purchases");
+      //return response.data;
+      setIsRecentPurchasesLoading(false);
+      setRecentPurchases([]);
     } catch (error) {
-      console.error("Error fetching businesses data:", error);
-      throw error; // Rethrow the error to be handled by the caller
+      console.error("Error fetching recent purchases data:", error);
+      setIsRecentPurchasesLoading(false);
     }
   };
 
-  useEffect(() => {
-    const loadRecentPurchases = async () => {
-      try {
-        setTimeout(async () => {
-          const allRecentPurchases = await fetchRecentPurchases();
-          setRecentPurchases(allRecentPurchases);
-          setIsLoading(false);
-        }, 2000);
-      } catch (error) {
-        console.error("Failed to load recent purchases:", error);
-      }
-    };
+  const getUserData = async () => {
+    setUserDataLoading(true);
+    const userData = await SecureStore.getItemAsync("userInfo");
+    console.log("User data:", userData);
+    setUserData(JSON.parse(userData));
+    setUserDataLoading(false);
+  };
 
-    loadRecentPurchases();
+  const updateUsername = async (updatedUsername) => {
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/update-username`;
+    axios
+      .put(apiUrl, updatedUsername, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "text/plain",
+        },
+      })
+      .then((response) => {
+        console.log("Username updated successfully");
+        // Update the username in the secure storage too
+        const newUserInfo = { ...userData, username: updatedUsername };
+        SecureStore.setItemAsync("userInfo", JSON.stringify(newUserInfo));
+        getUserData();
+      })
+      .catch((error) => {
+        console.error("Error updating username:", error);
+      });
+  };
+
+  useEffect(() => {
+    getUserData();
+    fetchRecentPurchases();
+    const userToken = SecureStore.getItemAsync("userToken");
   }, []);
 
   const buttonTexts = [
@@ -130,15 +158,44 @@ const ProfileScreen = ({ navigation }) => {
                 justifyContent: "space-between",
               }}
             >
-              <Text variant="titleLarge" style={{ marginTop: 12 }}>
-                {name}
-              </Text>
-              <IconButton
-                icon="rename-box"
-                iconColor="#A9A9A9"
-                size={25}
-                onPress={() => console.log("Pressed")}
-              />
+              {userDataLoading ? (
+                <ActivityIndicator
+                  animating={true}
+                  color="#f2b149"
+                  size="large"
+                />
+              ) : isUsernameEditable ? (
+                <>
+                  <TextInput
+                    value={newUsername}
+                    onChangeText={setNewUsername}
+                    autoFocus={true}
+                    style={{ flex: 1 }}
+                  />
+                  <IconButton
+                    icon="content-save"
+                    iconColor="#A9A9A9"
+                    size={25}
+                    onPress={() => {
+                      setUsernameEditable(false);
+                      console.log("Updating username to:", newUsername);
+                      updateUsername(newUsername);
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text variant="titleLarge" style={{ marginTop: 12 }}>
+                    {userData.username}
+                  </Text>
+                  <IconButton
+                    icon="pencil"
+                    iconColor="#A9A9A9"
+                    size={25}
+                    onPress={() => setUsernameEditable(true)}
+                  />
+                </>
+              )}
             </Card.Content>
           </Card>
           <Card
@@ -155,15 +212,19 @@ const ProfileScreen = ({ navigation }) => {
                 justifyContent: "space-between",
               }}
             >
-              <Text variant="titleMedium" style={{ marginTop: 12 }}>
-                {email}
-              </Text>
-              <IconButton
-                icon="rename-box"
-                iconColor="#A9A9A9"
-                size={25}
-                onPress={() => console.log("Pressed")}
-              />
+              {userDataLoading ? (
+                <ActivityIndicator
+                  animating={true}
+                  color="#f2b149"
+                  size="large"
+                />
+              ) : (
+                <Text variant="titleMedium" style={{ marginTop: 12 }}>
+                  {userData.email}
+                </Text>
+              )}
+              <IconButton size={25} />
+              {/*Add an Icon here if we want to make this editable later*/}
             </Card.Content>
           </Card>
         </View>
@@ -191,7 +252,7 @@ const ProfileScreen = ({ navigation }) => {
                 justifyContent: "space-between",
               }}
             >
-              {isLoading ? (
+              {isRecentPurchasesLoading ? (
                 <View
                   style={{
                     flex: 1,
@@ -299,8 +360,7 @@ const ProfileScreen = ({ navigation }) => {
             buttonColor="white"
             onPress={handleViewAllPurchases}
           >
-            {" "}
-            View All Past Purchases{" "}
+            View All Past Purchases
           </Button>
         </View>
       </LinearGradient>
