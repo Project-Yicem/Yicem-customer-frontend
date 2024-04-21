@@ -11,6 +11,7 @@ import {
   Portal,
   TextInput,
   ActivityIndicator,
+  Snackbar,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
@@ -30,8 +31,45 @@ const ProfileScreen = ({ navigation }) => {
   const [userDataLoading, setUserDataLoading] = useState(false);
   const [isUsernameEditable, setUsernameEditable] = useState(false);
   const [newUsername, setNewUsername] = useState("");
+  const [passwordState, setPasswordState] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async (passwordState) => {
+    console.log("Changing password with state:", passwordState);
+    if (passwordState.newPassword !== passwordState.confirmPassword) {
+      alert(
+        "Please make sure the new password and confirm password fields match."
+      );
+      return;
+    }
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/update-password`;
+    const passwordData = {
+      oldPassword: passwordState.currentPassword,
+      newPassword: passwordState.newPassword,
+    };
+    axios
+      .put(apiUrl, passwordData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Password updated successfully");
+        setChangePasswordModalVisible(false);
+        setPasswordUpdated(true);
+      })
+      .catch((error) => {
+        alert(
+          "Error updating password. Please try again and make sure your old password is correct."
+        );
+      });
+
     setChangePasswordModalVisible(false);
   };
   const handleHelpClose = () => {
@@ -421,21 +459,47 @@ const ProfileScreen = ({ navigation }) => {
             }}
           >
             <TextInput
+              label="Current Password"
+              secureTextEntry
+              style={{ marginBottom: 16 }}
+              onChangeText={(text) =>
+                setPasswordState({ ...passwordState, currentPassword: text })
+              }
+            />
+            <TextInput
               label="New Password"
               secureTextEntry
               style={{ marginBottom: 16 }}
+              onChangeText={(text) =>
+                setPasswordState({ ...passwordState, newPassword: text })
+              }
             />
             <TextInput
               label="Confirm Password"
               secureTextEntry
               style={{ marginBottom: 16 }}
+              onChangeText={(text) =>
+                setPasswordState({ ...passwordState, confirmPassword: text })
+              }
             />
-            <Button mode="contained" onPress={handleChangePassword}>
+            <Button
+              mode="contained"
+              onPress={() => handleChangePassword(passwordState)}
+            >
               Change Password
             </Button>
           </View>
         </Modal>
       </Portal>
+      {/* Password updated snackbar */}
+      <Snackbar
+        visible={passwordUpdated}
+        onDismiss={() => setPasswordUpdated(false)}
+        onIconPress={() => setPasswordUpdated(false)}
+        duration={Snackbar.LENGTH_SHORT}
+      >
+        Your password has been updated successfully.
+      </Snackbar>
       {/* "Help" Modal */}
       <Portal>
         <Modal visible={isHelpModalVisible} onDismiss={handleHelpClose}>
