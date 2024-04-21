@@ -163,8 +163,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
               {business.businessName}
             </Text>
             <Paragraph style={{ color: "white" }}>
-              {/**TODO update this when the opening-closing time logic changes*/}
-              Open hours: {business.workingHours}
+              Open hours: {business.openingHour} - {business.closingHour}
             </Paragraph>
             <View
               style={{
@@ -209,7 +208,9 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
           </View>
           <View style={{ flexDirection: "column" }}>
             <Image
-              source={business.logo}
+              source={
+                business.logo ? business.logo : require("../assets/splash.png")
+              }
               style={{
                 width: 100,
                 height: 100,

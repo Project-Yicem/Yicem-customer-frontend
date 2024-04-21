@@ -22,10 +22,8 @@ const PastPurchasesScreen = ({ navigation }) => {
 
   const fetchRecentPurchases = async () => {
     try {
-      const response = await axios.get(
-        "http://192.168.1.15:3000/recent-purchases"
-      );
-      return response.data;
+      // todo
+      return [];
     } catch (error) {
       console.error("Error fetching businesses data:", error);
       throw error; // Rethrow the error to be handled by the caller

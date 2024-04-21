@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import {
   Text,
   Card,
@@ -14,6 +20,7 @@ import { TouchableOpacity } from "react-native";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import axios from "axios";
 import businessesData from "../DataFiles/businessesData.js";
+import { IP_ADDRESS } from "../Functions/GetIP.js";
 
 const HomeScreen = ({ navigation }) => {
   const [businesses, setBusinesses] = useState([]);
@@ -21,64 +28,78 @@ const HomeScreen = ({ navigation }) => {
   const [isLoadingBusinesses, setIsLoadingBusinesses] = useState(true);
   const [isLoadingActiveReservations, setIsLoadingActiveReservations] =
     useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchBusinesses = async () => {
     try {
-      const response = await axios.get("http://10.0.2.2:3000/businesses");
-      return response.data;
+      setIsLoadingBusinesses(true);
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/view-businesses`;
+      const response = await axios.get(apiUrl);
+      console.log("Businesses data fetched in Home screen");
+
+      // TODO This is temporary!!! This should be handled by the backend
+      const updatedBusinesses = response.data.map((business) => {
+        const currentTime = new Date().getHours();
+        const openingTime = parseInt(business.openingHour.split(":")[0]);
+        const closingTime = parseInt(business.closingHour.split(":")[0]);
+        business.isOpen =
+          currentTime >= openingTime && currentTime < closingTime;
+
+        return business;
+      });
+
+      // Filter the businesses so that only open businesses with available offers are shown
+      const filteredBusinesses = updatedBusinesses.filter(
+        (business) =>
+          business.isOpen &&
+          business.currentOffers &&
+          business.currentOffers.length > 0
+      );
+      setBusinesses(filteredBusinesses);
+      setIsLoadingBusinesses(false);
     } catch (error) {
       console.error("Error fetching businesses data:", error);
-      throw error; // Rethrow the error to be handled by the caller
+      setIsLoadingBusinesses(false);
     }
   };
 
   const fetchActiveReservations = async () => {
     try {
-      const response = await axios.get(
-        "http://10.0.2.2:3000/active-reservations"
-      );
-      return response.data;
+      // todo: fetch active reservations
+      setIsLoadingActiveReservations(false);
+      return [];
     } catch (error) {
       console.error("Error fetching active reservations data:", error);
-      throw error; // Rethrow the error to be handled by the caller
     }
   };
 
   useEffect(() => {
-    const loadBusinesses = async () => {
-      try {
-        const allBusinesses = await fetchBusinesses();
-        // Filter businesses to only show those within 500 meters
-        const filteredBusinesses = allBusinesses.filter(
-          (business) => parseInt(business.distance) < 500
-        );
-      } catch (error) {
-        console.error("Failed to load businesses:", error);
-      }
-    };
-    const loadActiveReservations = async () => {
-      try {
-        //const allActiveReservations = await fetchActiveReservations();
-      } catch (error) {
-        console.error("Failed to load active reservations:", error);
-      }
-    };
-
-    loadBusinesses();
-    loadActiveReservations();
+    fetchBusinesses();
+    fetchActiveReservations();
   }, []);
 
   const [activeSlide, setActiveSlide] = useState(0);
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={() => {
+            fetchBusinesses();
+            fetchActiveReservations();
+          }}
+        />
+      }
+    >
       <LinearGradient
         colors={["#ff8069", "rgba(0,0,0,0)"]}
         locations={[0, 0.5]} // Adjust the values based on your preference
       >
         <Text
           style={{ marginTop: "10%", marginLeft: "5%" }}
-          variant="headlineMedium"
+          variant="headlineSmall"
         >
           Your active reservations
         </Text>
@@ -86,7 +107,11 @@ const HomeScreen = ({ navigation }) => {
       {isLoadingActiveReservations ? (
         <ActivityIndicator animating={true} color={theme.colors.primary} />
       ) : activeReservations.length === 0 ? (
-        <Text style={{ margin: "5%" }}>No active reservations</Text>
+        <Card mode="contained" style={styles.businessCard}>
+          <Text style={{ padding: 20, fontStyle: "italic" }}>
+            You have no active reservations right now.
+          </Text>
+        </Card>
       ) : (
         <View>
           <>
@@ -130,14 +155,16 @@ const HomeScreen = ({ navigation }) => {
           </>
         </View>
       )}
-      <Text style={{ marginLeft: "5%" }} variant="headlineMedium">
-        Offers Near You
+      <Text style={{ marginLeft: "5%" }} variant="headlineSmall">
+        Available offers right now
       </Text>
       <ScrollView>
         {isLoadingBusinesses ? (
           <ActivityIndicator animating={true} color={theme.colors.primary} />
         ) : businesses.length === 0 ? (
-          <Text style={{ margin: "5%" }}>No businesses found</Text>
+          <Text style={{ margin: "5%" }}>
+            No businesses found with available offers
+          </Text>
         ) : (
           businesses.map((business) => (
             <TouchableOpacity
@@ -154,7 +181,8 @@ const HomeScreen = ({ navigation }) => {
                 <LinearGradient
                   colors={
                     business.isOpen
-                      ? business.availableOffers
+                      ? business.currentOffers &&
+                        business.currentOffers.length > 0
                         ? ["#f23545", "#ff9c6b"] // Open with offers: red to orange gradient
                         : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"] // Open without offers: semi-transparent red to orange gradient
                       : ["#808080", "#ffffff"] // Closed: gray to white gradient
@@ -167,20 +195,25 @@ const HomeScreen = ({ navigation }) => {
                     style={{ flexDirection: "row", alignItems: "center" }}
                   >
                     <View style={{ flex: 1 }}>
-                      <Title style={{ color: "white" }}>{business.name}</Title>
+                      <Title style={{ color: "white" }}>
+                        {business.businessName}
+                      </Title>
                       <Paragraph style={{ color: "white" }}>
                         {business.isOpen
-                          ? business.availableOffers
+                          ? business.currentOffers &&
+                            business.currentOffers.length > 0
                             ? "Open"
                             : "No offers available right now"
-                          : "Closed: Opens at " + business.openingTime}
+                          : "Closed: Opens at " + business.openingHour}
                       </Paragraph>
-                      <Text style={{ color: "white" }}>
-                        {business.distance}
-                      </Text>
                     </View>
+                    {/* Use splash.png if business logo is not available */}
                     <Card.Cover
-                      source={business.logo}
+                      source={
+                        business.logo
+                          ? business.logo
+                          : require("../assets/splash.png")
+                      }
                       style={{ width: 50, height: 50 }}
                     />
                   </Card.Content>
@@ -190,7 +223,7 @@ const HomeScreen = ({ navigation }) => {
           ))
         )}
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 

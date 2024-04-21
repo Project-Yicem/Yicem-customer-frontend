@@ -29,10 +29,14 @@ const BusinessesScreen = ({ navigation }) => {
       console.log("Businesses data fetched in BusinessesScreen");
       setIsBusinessesLoading(false);
 
-      // Add an arbitrary "isOpen" attribute to each business
       // TODO This is temporary!!! This should be handled by the backend
       const updatedBusinesses = response.data.map((business) => {
-        business.isOpen = true;
+        const currentTime = new Date().getHours();
+        const openingTime = parseInt(business.openingHour.split(":")[0]);
+        const closingTime = parseInt(business.closingHour.split(":")[0]);
+        business.isOpen =
+          currentTime >= openingTime && currentTime < closingTime;
+
         return business;
       });
       setBusinesses(updatedBusinesses);
@@ -125,11 +129,16 @@ const BusinessesScreen = ({ navigation }) => {
                             business.currentOffers.length > 0
                             ? "Open"
                             : "No offers available right now"
-                          : "Closed: Opens at " + business.openingTime}
+                          : "Closed: Opens at " + business.openingHour}
                       </Paragraph>
                     </View>
+                    {/* Use splash.png if business logo is not available */}
                     <Card.Cover
-                      source={business.logo}
+                      source={
+                        business.logo
+                          ? business.logo
+                          : require("../assets/splash.png")
+                      }
                       style={{ width: 50, height: 50 }}
                     />
                   </Card.Content>

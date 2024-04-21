@@ -31,17 +31,25 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
         },
       })
       .then((response) => {
-        // Add an arbitrary "isOpen" attribute to each business
         // TODO This is temporary!!! This should be handled by the backend
+        if (!response.data) {
+          setIsBusinessesLoading(false);
+          console.log("No favorite businesses found");
+          return;
+        }
         const updatedBusinesses = response.data.map((business) => {
-          business.isOpen = true;
-          return business;
+          // calculate if current system time is between opening and closing time
+          const currentTime = new Date().getHours();
+          const openingTime = parseInt(business.openingHour.split(":")[0]);
+          const closingTime = parseInt(business.closingHour.split(":")[0]);
+          business.isOpen =
+            currentTime >= openingTime && currentTime < closingTime;
         });
         setBusinesses(updatedBusinesses);
 
         setBusinesses(response.data);
         setIsBusinessesLoading(false);
-        console.log("Favorite businesses data fetched");
+        console.log("Favorite businesses data fetched", response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -116,11 +124,16 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
                             business.currentOffers.length > 0
                             ? "Open"
                             : "No offers available right now"
-                          : "Closed: Opens at " + business.openingTime}
+                          : "Closed: Opens at " + business.openingHour}
                       </Paragraph>
                     </View>
+                    {/* Use splash.png if business logo is not available */}
                     <Card.Cover
-                      source={business.logo}
+                      source={
+                        business.logo
+                          ? business.logo
+                          : require("../assets/splash.png")
+                      }
                       style={{ width: 50, height: 50 }}
                     />
                   </Card.Content>
