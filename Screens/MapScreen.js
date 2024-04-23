@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MapView, { Marker, Callout } from "react-native-maps";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import businessData from "../DataFiles/businessesData";
+import axios from "axios";
+import { IP_ADDRESS } from "../Functions/GetIP";
+import { ActivityIndicator, Avatar, Title } from "react-native-paper";
+import { Image } from "react-native";
 
 export default function MapScreen({ navigation }) {
+  const [businessData, setBusinessData] = useState([]);
+  const [businessDataLoading, setBusinessDataLoading] = useState(false);
+  const [markers, setMarkers] = useState([]);
+
   // initial start coordinates of the map
   const initialRegion = {
     latitude: 39.868254625289254,
@@ -12,10 +19,35 @@ export default function MapScreen({ navigation }) {
     longitudeDelta: 0.005345307290554047,
   };
 
-  // Function to get business data based on marker ID
-  const getBusinessData = (markerId) => {
-    return businessesData.find((business) => business.id === markerId);
+  // fetch business data from the backend
+  const fetchBusinessData = async () => {
+    setBusinessDataLoading(true);
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/view-businesses`;
+    try {
+      const response = await axios.get(apiUrl);
+      setBusinessData(response.data);
+      setMarkers(
+        response.data.map((business) => ({
+          id: business.id,
+          latitude: parseFloat(business.locationLatitude),
+          longitude: parseFloat(business.locationLongitude),
+          title: business.businessName,
+          description: business.address,
+          logo: business.logo,
+        }))
+      );
+      console.log("Business data fetched in Map screen");
+      console.log(markers[0]);
+
+      setBusinessDataLoading(false);
+    } catch (error) {
+      console.error("Error fetching business data in map screen:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchBusinessData();
+  }, []);
 
   // when the text field on top of a marker is pressed, change screen
   const onCalloutPress = (businessId) => {
@@ -31,15 +63,6 @@ export default function MapScreen({ navigation }) {
     setSelectedMarker(marker);
   };
 
-  // Create markers based on the business data
-  const markers = businessData.map((business) => ({
-    id: business.id,
-    latitude: business.latitude,
-    longitude: business.longitude,
-    title: business.name,
-    description: business.open ? "Open" : "Closed",
-  }));
-
   // to record the latitude longitude values when screen is moved
   const onRegionChange = (region) => {
     console.log(region);
@@ -47,26 +70,35 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={initialRegion}>
-        {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            coordinate={{
-              latitude: marker.latitude,
-              longitude: marker.longitude,
-            }}
-            title={marker.title}
-            description={marker.description}
-          >
-            <Callout onPress={() => onCalloutPress(marker.id)}>
-              <View>
-                <Text>{marker.title}</Text>
-                <Text>{marker.description}</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-      </MapView>
+      {businessDataLoading ? (
+        <ActivityIndicator
+          animating={true}
+          color="#f25e35"
+          size="large"
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        />
+      ) : (
+        <MapView style={styles.map} initialRegion={initialRegion}>
+          {markers.map((marker) => (
+            <Marker
+              key={marker.id}
+              coordinate={{
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }}
+              title={marker.title}
+              description={marker.description}
+            >
+              <Callout onPress={() => onCalloutPress(marker.id)}>
+                <View>
+                  <Title>{marker.title}</Title>
+                  <Text>{marker.description}</Text>
+                </View>
+              </Callout>
+            </Marker>
+          ))}
+        </MapView>
+      )}
     </View>
   );
 }

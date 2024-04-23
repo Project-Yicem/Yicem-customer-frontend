@@ -29,7 +29,6 @@ const BusinessesScreen = ({ navigation }) => {
       console.log("Businesses data fetched in BusinessesScreen");
       setIsBusinessesLoading(false);
 
-      // TODO This is temporary!!! This should be handled by the backend
       /* const updatedBusinesses = response.data.map((business) => {
         const currentTime = new Date().getHours();
         const openingTime = parseInt(business.openingHour.split(":")[0]);
@@ -39,11 +38,29 @@ const BusinessesScreen = ({ navigation }) => {
 
         return business;
       }); */
-      setBusinesses(response.data);
+      setBusinesses(orderBusinesses(response.data));
     } catch (error) {
       console.error("Error fetching businesses data:", error);
       setIsBusinessesLoading(false);
     }
+  };
+
+  const orderBusinesses = (businesses) => {
+    // Order the businesses so that the open ones with available offers are shown first,
+    //open ones with no offers are shown later, and closed ones are shown last
+    const openBusinessesWithOffers = businesses.filter(
+      (business) =>
+        business.open && business.offers && business.offers.length > 0
+    );
+    const openBusinessesWithoutOffers = businesses.filter(
+      (business) =>
+        business.open && (!business.offers || business.offers.length === 0)
+    );
+    const closedBusinesses = businesses.filter((business) => !business.open);
+
+    return openBusinessesWithOffers.concat(
+      openBusinessesWithoutOffers.concat(closedBusinesses)
+    );
   };
 
   useEffect(() => {

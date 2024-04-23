@@ -21,6 +21,7 @@ import Carousel, { Pagination } from "react-native-snap-carousel";
 import axios from "axios";
 import businessesData from "../DataFiles/businessesData.js";
 import { IP_ADDRESS } from "../Functions/GetIP.js";
+import * as SecureStore from "expo-secure-store";
 
 const HomeScreen = ({ navigation }) => {
   const [businesses, setBusinesses] = useState([]);
@@ -29,6 +30,7 @@ const HomeScreen = ({ navigation }) => {
   const [isLoadingActiveReservations, setIsLoadingActiveReservations] =
     useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [reservationCanceling, setReservationCanceling] = useState(false);
 
   const fetchBusinesses = async () => {
     try {
@@ -62,12 +64,45 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const fetchActiveReservations = async () => {
+    setIsLoadingActiveReservations(true);
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/reservations`;
+
     try {
-      // todo: fetch active reservations
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      console.log(
+        "Active reservations data fetched in Home screen",
+        response.data
+      );
+      setActiveReservations(response.data);
       setIsLoadingActiveReservations(false);
       return [];
     } catch (error) {
       console.error("Error fetching active reservations data:", error);
+    }
+  };
+
+  const cancelReservation = async (reservationId) => {
+    setReservationCanceling(true);
+    const userToken = await SecureStore.getItemAsync("userToken");
+    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/cancel/${reservationId}`;
+
+    try {
+      await axios.post(apiUrl, null, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      console.log("Reservation cancelled successfully");
+      setReservationCanceling(false);
+      fetchActiveReservations();
+    } catch (error) {
+      console.error("Error cancelling reservation:", error);
+      setReservationCanceling(false);
     }
   };
 
@@ -123,19 +158,39 @@ const HomeScreen = ({ navigation }) => {
                   mode="contained"
                 >
                   <Card.Content>
-                    <Title style={{ color: "white" }}>{item.cafeName}</Title>
-                    <Paragraph style={{ color: "white" }}>
-                      {item.itemTitle}
-                    </Paragraph>
-                    <Paragraph style={{ color: "white" }}>
-                      Price: {item.price}
-                    </Paragraph>
-                    <Paragraph style={{ color: "white" }}>
-                      Pickup time: {item.pickupTime}
-                    </Paragraph>
-                    <Button onPress={() => {}} textColor="#ffda6b" mode="text">
-                      Cancel Reservation
-                    </Button>
+                    <Title style={{ color: "#fff5b8" }}>
+                      {item.sellerName}
+                    </Title>
+                    <Text style={{ color: "white" }}>{item.offerName}</Text>
+                    {/**Display price and pickup time in the same row */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        marginVertical: 10,
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>
+                        Price: ₺{item.offerPrice}
+                      </Text>
+                      <Text style={{ color: "white" }}>
+                        Pickup time: {item.timeslot}
+                      </Text>
+                    </View>
+                    {reservationCanceling ? (
+                      <ActivityIndicator
+                        animating={true}
+                        color={theme.colors.primary}
+                      />
+                    ) : (
+                      <Button
+                        onPress={() => cancelReservation(item.id)}
+                        textColor="#ffda6b"
+                        mode="text"
+                      >
+                        Cancel Reservation
+                      </Button>
+                    )}
                   </Card.Content>
                 </Card>
               )}

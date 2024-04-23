@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, RefreshControl } from "react-native";
 import {
   Searchbar,
   Card,
@@ -19,6 +19,7 @@ import { IP_ADDRESS } from "../Functions/GetIP";
 const FavoriteBusinessesScreen = ({ navigation }) => {
   const [businesses, setBusinesses] = useState([]);
   const [isBusinessesLoading, setIsBusinessesLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchBusinesses = async () => {
     setIsBusinessesLoading(true);
@@ -37,7 +38,7 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
           return;
         }
         // TODO: Handle this from backend
-        const updatedBusinesses = response.data.map((business) => {
+        /*         const updatedBusinesses = response.data.map((business) => {
           // calculate if current system time is between opening and closing time
           const currentTime = new Date().getHours();
           const openingTime = parseInt(business.openingHour.split(":")[0]);
@@ -46,8 +47,8 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
             ...business,
             open: currentTime >= openingTime && currentTime < closingTime,
           };
-        });
-        setBusinesses(updatedBusinesses);
+        });*/
+        setBusinesses(response.data);
 
         setIsBusinessesLoading(false);
         console.log("Favorite businesses data fetched");
@@ -71,7 +72,18 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
         />
         <Appbar.Content title="Your Favorites" color="white" />
       </Appbar.Header>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              fetchBusinesses();
+              setRefreshing(false);
+            }}
+          />
+        }
+      >
         {isBusinessesLoading ? (
           <ActivityIndicator
             animating={true}
