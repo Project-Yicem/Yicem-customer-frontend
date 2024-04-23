@@ -31,25 +31,26 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
         },
       })
       .then((response) => {
-        // TODO This is temporary!!! This should be handled by the backend
         if (!response.data) {
           setIsBusinessesLoading(false);
           console.log("No favorite businesses found");
           return;
         }
+        // TODO: Handle this from backend
         const updatedBusinesses = response.data.map((business) => {
           // calculate if current system time is between opening and closing time
           const currentTime = new Date().getHours();
           const openingTime = parseInt(business.openingHour.split(":")[0]);
           const closingTime = parseInt(business.closingHour.split(":")[0]);
-          business.isOpen =
-            currentTime >= openingTime && currentTime < closingTime;
+          return {
+            ...business,
+            open: currentTime >= openingTime && currentTime < closingTime,
+          };
         });
         setBusinesses(updatedBusinesses);
 
-        setBusinesses(response.data);
         setIsBusinessesLoading(false);
-        console.log("Favorite businesses data fetched", response.data);
+        console.log("Favorite businesses data fetched");
       })
       .catch((error) => {
         console.log(error);
@@ -100,9 +101,8 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
               >
                 <LinearGradient
                   colors={
-                    business.isOpen
-                      ? business.currentOffers &&
-                        business.currentOffers.length > 0
+                    business.open
+                      ? business.offers && business.offers.length > 0
                         ? ["#f23545", "#ff9c6b"]
                         : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"]
                       : ["#808080", "#ffffff"]
@@ -119,9 +119,8 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
                         {business.businessName}
                       </Title>
                       <Paragraph style={{ color: "white" }}>
-                        {business.isOpen
-                          ? business.currentOffers &&
-                            business.currentOffers.length > 0
+                        {business.open
+                          ? business.offers && business.offers.length > 0
                             ? "Open"
                             : "No offers available right now"
                           : "Closed: Opens at " + business.openingHour}
@@ -131,7 +130,7 @@ const FavoriteBusinessesScreen = ({ navigation }) => {
                     <Card.Cover
                       source={
                         business.logo
-                          ? business.logo
+                          ? (source = { uri: business.logo })
                           : require("../assets/splash.png")
                       }
                       style={{ width: 50, height: 50 }}

@@ -30,7 +30,7 @@ const BusinessesScreen = ({ navigation }) => {
       setIsBusinessesLoading(false);
 
       // TODO This is temporary!!! This should be handled by the backend
-      const updatedBusinesses = response.data.map((business) => {
+      /* const updatedBusinesses = response.data.map((business) => {
         const currentTime = new Date().getHours();
         const openingTime = parseInt(business.openingHour.split(":")[0]);
         const closingTime = parseInt(business.closingHour.split(":")[0]);
@@ -38,8 +38,8 @@ const BusinessesScreen = ({ navigation }) => {
           currentTime >= openingTime && currentTime < closingTime;
 
         return business;
-      });
-      setBusinesses(updatedBusinesses);
+      }); */
+      setBusinesses(response.data);
     } catch (error) {
       console.error("Error fetching businesses data:", error);
       setIsBusinessesLoading(false);
@@ -105,9 +105,8 @@ const BusinessesScreen = ({ navigation }) => {
               >
                 <LinearGradient
                   colors={
-                    business.isOpen
-                      ? business.currentOffers &&
-                        business.currentOffers.length > 0
+                    business.open
+                      ? business.offers && business.offers.length > 0
                         ? ["#f23545", "#ff9c6b"]
                         : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"]
                       : ["#808080", "#ffffff"]
@@ -124,9 +123,8 @@ const BusinessesScreen = ({ navigation }) => {
                         {business.businessName}
                       </Title>
                       <Paragraph style={{ color: "white" }}>
-                        {business.isOpen
-                          ? business.currentOffers &&
-                            business.currentOffers.length > 0
+                        {business.open
+                          ? business.offers && business.offers.length > 0
                             ? "Open"
                             : "No offers available right now"
                           : "Closed: Opens at " + business.openingHour}
@@ -136,7 +134,7 @@ const BusinessesScreen = ({ navigation }) => {
                     <Card.Cover
                       source={
                         business.logo
-                          ? business.logo
+                          ? (source = { uri: business.logo })
                           : require("../assets/splash.png")
                       }
                       style={{ width: 50, height: 50 }}

@@ -37,7 +37,7 @@ export default function MapScreen({ navigation }) {
     latitude: business.latitude,
     longitude: business.longitude,
     title: business.name,
-    description: business.isOpen ? "Open" : "Closed",
+    description: business.open ? "Open" : "Closed",
   }));
 
   // to record the latitude longitude values when screen is moved

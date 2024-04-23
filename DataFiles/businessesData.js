@@ -2,7 +2,6 @@ const businessData = [
   {
     id: 1,
     name: "Velocity Cafe",
-    logo: require("../assets/businesslogos/logo_bakery.png"),
     isOpen: true,
     availableOffers: true,
     openingTime: "10:00",
@@ -33,7 +32,6 @@ const businessData = [
   {
     id: 2,
     name: "Beethoven Cafe",
-    logo: require("../assets/businesslogos/logo_coffee.png"),
     isOpen: true,
     availableOffers: true,
     openingTime: "10:00",
@@ -69,7 +67,6 @@ const businessData = [
   {
     id: 3,
     name: "Cafe Fiery",
-    logo: require("../assets/businesslogos/logo_F.jpeg"),
     isOpen: true,
     availableOffers: true,
     openingTime: "10:00",
@@ -104,7 +101,6 @@ const businessData = [
   {
     id: 4,
     name: "Rooftop Restaurant",
-    logo: require("../assets/businesslogos/logo_salad.png"),
     isOpen: true,
     availableOffers: false,
     openingTime: "10:00",
@@ -119,7 +115,6 @@ const businessData = [
   {
     id: 5,
     name: "Tea Break",
-    logo: require("../assets/businesslogos/logo_tea.jpeg"),
     isOpen: false,
     availableOffers: true,
     openingTime: "10:00",

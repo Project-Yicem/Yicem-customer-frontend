@@ -32,8 +32,16 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [offers, setOffers] = useState();
   const [isOffersLoading, setIsOffersLoading] = useState(false);
+  const [pickupTimesInModal, setPickupTimesInModal] = useState([]);
+  const [offerIdInModal, setOfferIdInModal] = useState(null);
+  const [reservationTime, setReservationTime] = useState(null);
 
-  const showModal = () => setModalVisible(true);
+  const showModal = (offerId, pickupTimes) => {
+    console.log("Offer modal pressed for offerId: ", offerId);
+    setPickupTimesInModal(pickupTimes);
+    setOfferIdInModal(offerId);
+    setModalVisible(true);
+  };
   const hideModal = () => setModalVisible(false);
 
   const showDialog = () => {
@@ -81,10 +89,6 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   };
 
   const fetchOffers = async () => {
-    if (!business.currentOffers) {
-      setOffers([]);
-      return;
-    }
     setIsOffersLoading(true);
     // Include user token in the request headers
     const userToken = await SecureStore.getItemAsync("userToken");
@@ -103,6 +107,18 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     }
   };
 
+  const makeReservation = async (time) => {
+    // TODO, just log to console for now
+    console.log(
+      "Reservation made for time: ",
+      time,
+      "for offer id",
+      offerIdInModal
+    );
+    showDialog();
+    setReservationTime(`${time.pickupTimeStart} - ${time.pickupTimeEnd}`);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       fetchOffers();
@@ -113,8 +129,9 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     fetchData();
   }, []);
 
-  const addBusinessToFavorites = async (businessId) => {
-    const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/favorite/${businessId}`;
+  const favOrUnfavBusiness = async (businessId) => {
+    const apiUrlFav = `http://${IP_ADDRESS}:8080/api/buyer/favorite/${businessId}`;
+    const apiUrlUnfav = `http://${IP_ADDRESS}:8080/api/buyer/unfavorite/${businessId}`;
     // Include user token in the request headers
     const userToken = await SecureStore.getItemAsync("userToken");
     const headers = {
@@ -123,10 +140,13 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     try {
       if (isFavorite) {
         // Remove business from favorites
-        // TODO implement this when the un-favorite API is handled on the backend
+        console.log("Removing business from favorites", businessId, headers);
+        await axios.post(apiUrlUnfav, null, { headers });
+        setIsFavorite(false);
+        console.log("Business removed from favorites");
       } else {
         // Add business to favorites
-        await axios.post(apiUrl, null, { headers });
+        await axios.post(apiUrlFav, null, { headers });
         setIsFavorite(true);
         console.log("Business added to favorites");
       }
@@ -135,12 +155,73 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     }
   };
 
+  const OfferReservationModal = ({
+    pickupTimes,
+    visible,
+    onDismiss,
+    onReservation,
+  }) => {
+    const [checkedTime, setCheckedTime] = useState("");
+
+    const handleCheckboxChange = (time) => {
+      setCheckedTime(time);
+    };
+
+    return (
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={onDismiss}
+          contentContainerStyle={containerStyle}
+        >
+          <Title>Choose A Time To Pick Up The Box</Title>
+          {pickupTimes.map((time, index) => (
+            <View
+              key={index}
+              style={{ flexDirection: "row", alignItems: "center" }}
+            >
+              <RadioButton
+                value={time}
+                status={checkedTime === time ? "checked" : "unchecked"}
+                onPress={() => handleCheckboxChange(time)}
+              />
+              <Text>{`${time.pickupTimeStart}-${time.pickupTimeEnd}`}</Text>
+            </View>
+          ))}
+          <Button mode="contained" onPress={() => onReservation(checkedTime)}>
+            Make A Reservation
+          </Button>
+        </Modal>
+      </Portal>
+    );
+  };
+
+  const ReservationSuccessDialog = ({
+    reservationTime,
+    visible,
+    onDismiss,
+  }) => {
+    return (
+      <Portal>
+        <Dialog visible={visible} onDismiss={onDismiss}>
+          <Dialog.Content>
+            <Title>Reservation Successful</Title>
+            <Paragraph>
+              You can pick up your box between {reservationTime}.
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={onDismiss}>OK</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+    );
+  };
+
   return (
     <ScrollView>
       <LinearGradient
-        colors={
-          business.isOpen ? ["#f25e35", "#ff9c6b"] : ["#808080", "#cacaca"]
-        }
+        colors={business.open ? ["#f25e35", "#ff9c6b"] : ["#808080", "#cacaca"]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
       >
@@ -209,7 +290,9 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
           <View style={{ flexDirection: "column" }}>
             <Image
               source={
-                business.logo ? business.logo : require("../assets/splash.png")
+                business.logo
+                  ? (source = { uri: business.logo })
+                  : require("../assets/splash.png")
               }
               style={{
                 width: 100,
@@ -236,7 +319,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                 mode="contained"
                 buttonColor={isFavorite ? "#ffa099" : "#f23545"}
                 onPress={() => {
-                  addBusinessToFavorites(business.id);
+                  favOrUnfavBusiness(business.id);
                 }}
               >
                 {isFavorite ? (
@@ -297,55 +380,21 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
             </Button>
           </Modal>
         </Portal>
-        <Portal>
-          <Modal
-            visible={modalVisible}
-            onDismiss={hideModal}
-            contentContainerStyle={containerStyle}
-          >
-            <Title>Choose A Time To Pick Up The Box</Title>
-            <View style={{ flexDirection: "row" }}>
-              <RadioButton
-                value="first"
-                status={checked === "first" ? "checked" : "unchecked"}
-                onPress={() => setChecked("first")}
-              />
-              <Text style={{ marginTop: 10 }}> 17:00-17.30 </Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <RadioButton
-                value="second"
-                status={checked === "second" ? "checked" : "unchecked"}
-                onPress={() => setChecked("second")}
-              />
-              <Text style={{ marginTop: 10 }}> 17:30-18:00 </Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <RadioButton
-                value="third"
-                status={checked === "third" ? "checked" : "unchecked"}
-                onPress={() => setChecked("third")}
-              />
-              <Text style={{ marginTop: 10 }}> 18:30-19:00 </Text>
-            </View>
-            <Button mode="contained" onPress={showDialog}>
-              Make A Reservation
-            </Button>
-          </Modal>
-        </Portal>
-        <Portal>
-          <Dialog visible={dialogVisible} onDismiss={hideDialog}>
-            <Dialog.Content>
-              <Title>Reservation Successful</Title>
-              <Paragraph>
-                You can pick up your box between 17:30-18:00.
-              </Paragraph>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={hideDialog}>OK</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+        {/* Offer reservation modal */}
+        <OfferReservationModal
+          pickupTimes={pickupTimesInModal}
+          visible={modalVisible}
+          onDismiss={hideModal}
+          onReservation={(time) => {
+            makeReservation(time);
+          }}
+        />
+        {/* Dialog for successful reservation */}
+        <ReservationSuccessDialog
+          reservationTime={reservationTime}
+          visible={dialogVisible}
+          onDismiss={hideDialog}
+        />
         <Title>Available Offers</Title>
         {isOffersLoading && (
           <ActivityIndicator
@@ -355,11 +404,14 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
           />
         )}
         {!isOffersLoading &&
-          (business.isOpen ? (
+          (business.open ? (
             Array.isArray(offers) && offers.length > 0 ? (
               offers.map((offer, index) => {
                 return offer.itemCount > 0 ? (
-                  <TouchableOpacity key={index} onPress={showModal}>
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => showModal(offer.id, offer.pickupTimes)}
+                  >
                     <Card
                       mode="outlined"
                       style={{

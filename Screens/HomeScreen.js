@@ -38,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
       console.log("Businesses data fetched in Home screen");
 
       // TODO This is temporary!!! This should be handled by the backend
-      const updatedBusinesses = response.data.map((business) => {
+      /*       const updatedBusinesses = response.data.map((business) => {
         const currentTime = new Date().getHours();
         const openingTime = parseInt(business.openingHour.split(":")[0]);
         const closingTime = parseInt(business.closingHour.split(":")[0]);
@@ -47,13 +47,11 @@ const HomeScreen = ({ navigation }) => {
 
         return business;
       });
-
+ */
       // Filter the businesses so that only open businesses with available offers are shown
-      const filteredBusinesses = updatedBusinesses.filter(
+      const filteredBusinesses = response.data.filter(
         (business) =>
-          business.isOpen &&
-          business.currentOffers &&
-          business.currentOffers.length > 0
+          business.open && business.offers && business.offers.length > 0
       );
       setBusinesses(filteredBusinesses);
       setIsLoadingBusinesses(false);
@@ -180,9 +178,8 @@ const HomeScreen = ({ navigation }) => {
               >
                 <LinearGradient
                   colors={
-                    business.isOpen
-                      ? business.currentOffers &&
-                        business.currentOffers.length > 0
+                    business.open
+                      ? business.offers && business.offers.length > 0
                         ? ["#f23545", "#ff9c6b"] // Open with offers: red to orange gradient
                         : ["rgba(242,53,69,0.4)", "rgba(255,156,107,0.4)"] // Open without offers: semi-transparent red to orange gradient
                       : ["#808080", "#ffffff"] // Closed: gray to white gradient
@@ -199,9 +196,8 @@ const HomeScreen = ({ navigation }) => {
                         {business.businessName}
                       </Title>
                       <Paragraph style={{ color: "white" }}>
-                        {business.isOpen
-                          ? business.currentOffers &&
-                            business.currentOffers.length > 0
+                        {business.open
+                          ? business.offers && business.offers.length > 0
                             ? "Open"
                             : "No offers available right now"
                           : "Closed: Opens at " + business.openingHour}
@@ -211,7 +207,7 @@ const HomeScreen = ({ navigation }) => {
                     <Card.Cover
                       source={
                         business.logo
-                          ? business.logo
+                          ? (source = { uri: business.logo })
                           : require("../assets/splash.png")
                       }
                       style={{ width: 50, height: 50 }}
