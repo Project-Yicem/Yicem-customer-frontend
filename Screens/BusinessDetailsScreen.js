@@ -185,6 +185,7 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     };
 
     fetchData();
+    console.log("Business details screen mounted", business);
   }, []);
 
   const favOrUnfavBusiness = async (businessId) => {

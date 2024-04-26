@@ -19,8 +19,6 @@ import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
 
 const ProfileScreen = ({ navigation }) => {
-  const [isReviewModalVisible, setReviewModalVisible] = useState(false);
-  const [reviewText, setReviewText] = useState("");
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] =
     useState(false);
   const [isHelpModalVisible, setHelpModalVisible] = useState(false);
@@ -79,11 +77,25 @@ const ProfileScreen = ({ navigation }) => {
   const fetchRecentPurchases = async () => {
     try {
       setIsRecentPurchasesLoading(true);
-      // TODO implement this when the purchase function is working correctly
-      //const response = await axios.get("http://10.0.2.2:3000/recent-purchases");
-      //return response.data;
+      const userToken = await SecureStore.getItemAsync("userToken");
+      const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/purchases`;
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      console.log("Recent purchases data fetched in ProfileScreen");
+      // Format the dates and times to be more readable
+      const formattedPurchases = response.data.map((purchase) => {
+        const transactionDate = new Date(purchase.transactionDate);
+        const formattedDate = `${transactionDate.getDate()}/${
+          transactionDate.getMonth() + 1
+        }/${transactionDate.getFullYear()} - ${transactionDate.getHours()}:${transactionDate.getMinutes()}`;
+        return { ...purchase, transactionDate: formattedDate };
+      });
+      setRecentPurchases(formattedPurchases);
+
       setIsRecentPurchasesLoading(false);
-      setRecentPurchases([]);
     } catch (error) {
       console.error("Error fetching recent purchases data:", error);
       setIsRecentPurchasesLoading(false);
@@ -134,17 +146,8 @@ const ProfileScreen = ({ navigation }) => {
   ];
   const iconSources = ["heart", "lock-reset", "help", "logout"];
 
-  const handleLeaveReview = () => {
-    setReviewModalVisible(true);
-  };
-
   const handleViewAllPurchases = () => {
     navigation.navigate("PastPurchases");
-  };
-
-  const handleSubmitReview = () => {
-    console.log("Review submitted:", reviewText);
-    setReviewModalVisible(false);
   };
 
   const handleCardPressed = async (buttonText) => {
@@ -313,7 +316,7 @@ const ProfileScreen = ({ navigation }) => {
                     }}
                   >
                     <Text variant="titleLarge">
-                      {recentPurchases[0].cafeName}
+                      {recentPurchases[0].sellerId}
                     </Text>
                     <View
                       style={{
@@ -322,7 +325,7 @@ const ProfileScreen = ({ navigation }) => {
                       }}
                     >
                       <Text style={{ marginTop: 7 }} variant="bodyLarge">
-                        {recentPurchases[0].itemTitle}
+                        {recentPurchases[0].offerId}
                       </Text>
                     </View>
                     <View
@@ -332,59 +335,12 @@ const ProfileScreen = ({ navigation }) => {
                       }}
                     >
                       <Text style={{ color: "gray" }}>
-                        {recentPurchases[0].date}
+                        {recentPurchases[0].transactionDate}
                       </Text>
                       <Text style={{ marginLeft: 10, color: "gray" }}>
-                        {recentPurchases[0].price}
+                        ₺{recentPurchases[0].price}
                       </Text>
-                      <Portal>
-                        <Modal
-                          visible={isReviewModalVisible}
-                          onDismiss={() => setReviewModalVisible(false)}
-                        >
-                          <View
-                            style={{
-                              backgroundColor: "white",
-                              padding: 16,
-                              borderRadius: 8,
-                              margin: 16,
-                            }}
-                          >
-                            <TextInput
-                              label="Write your review"
-                              multiline
-                              numberOfLines={8} // Adjust the number of lines
-                              maxLength={240} // Set the character limit
-                              value={reviewText}
-                              onChangeText={(text) => setReviewText(text)}
-                            />
-                            <Button
-                              mode="contained"
-                              onPress={handleSubmitReview}
-                              style={{ marginTop: 16 }}
-                            >
-                              Submit Review
-                            </Button>
-                          </View>
-                        </Modal>
-                      </Portal>
                     </View>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "column",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Button
-                      style={{ marginLeft: 20 }}
-                      mode="contained"
-                      title="Leave a Review"
-                      compact="true"
-                      onPress={handleLeaveReview}
-                    >
-                      Leave a Review
-                    </Button>
                   </View>
                 </>
               ) : (
