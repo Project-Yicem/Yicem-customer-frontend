@@ -1,3 +1,6 @@
+/* 
+These were only for testing, they are not used in the project.
+
 const businessData = [
   {
     id: 1,
@@ -135,3 +138,4 @@ const businessData = [
 ];
 
 export default businessData;
+ */

@@ -1,3 +1,6 @@
+/* 
+These were only for testing, they are not used in the project.
+
 const recentPurchases = [
   {
     cafeName: "Coffee House",
@@ -26,3 +29,4 @@ const recentPurchases = [
 ];
 
 export default recentPurchases;
+ */

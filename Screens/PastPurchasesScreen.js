@@ -265,7 +265,7 @@ const PastPurchasesScreen = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Text variant="titleLarge">No recent purchases</Text>
+          <Text variant="titleLarge">You have no purchases yet.</Text>
         </View>
       )}
       <Snackbar

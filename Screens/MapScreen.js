@@ -5,18 +5,45 @@ import axios from "axios";
 import { IP_ADDRESS } from "../Functions/GetIP";
 import { ActivityIndicator, Avatar, Title } from "react-native-paper";
 import { Image } from "react-native";
+import * as Location from "expo-location";
 
 export default function MapScreen({ navigation }) {
   const [businessData, setBusinessData] = useState([]);
   const [businessDataLoading, setBusinessDataLoading] = useState(false);
   const [markers, setMarkers] = useState([]);
+  const [currentRegion, setCurrentRegion] = useState(null);
 
-  // initial start coordinates of the map
-  const initialRegion = {
-    latitude: 39.868254625289254,
-    latitudeDelta: 0.008569388910380837,
-    longitude: 32.74868996813893,
-    longitudeDelta: 0.005345307290554047,
+  const getUserLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Location permission denied!");
+        setCurrentRegion({
+          latitude: 39.868254625289254,
+          latitudeDelta: 0.008569388910380837,
+          longitude: 32.74868996813893,
+          longitudeDelta: 0.005345307290554047,
+        });
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      setCurrentRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+    } catch (error) {
+      setCurrentRegion({
+        latitude: 39.868254625289254,
+        latitudeDelta: 0.008569388910380837,
+        longitude: 32.74868996813893,
+        longitudeDelta: 0.005345307290554047,
+      });
+
+      //console.error("Error getting user location:", error);
+    }
   };
 
   // fetch business data from the backend
@@ -26,6 +53,7 @@ export default function MapScreen({ navigation }) {
     try {
       const response = await axios.get(apiUrl);
       setBusinessData(response.data);
+
       setMarkers(
         response.data.map((business) => ({
           id: business.id,
@@ -37,7 +65,6 @@ export default function MapScreen({ navigation }) {
         }))
       );
       console.log("Business data fetched in Map screen");
-      console.log(markers[0]);
 
       setBusinessDataLoading(false);
     } catch (error) {
@@ -46,6 +73,7 @@ export default function MapScreen({ navigation }) {
   };
 
   useEffect(() => {
+    getUserLocation();
     fetchBusinessData();
   }, []);
 
@@ -70,7 +98,7 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {businessDataLoading ? (
+      {businessDataLoading || !currentRegion ? (
         <ActivityIndicator
           animating={true}
           color="#f25e35"
@@ -78,7 +106,12 @@ export default function MapScreen({ navigation }) {
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         />
       ) : (
-        <MapView style={styles.map} initialRegion={initialRegion}>
+        <MapView
+          style={styles.map}
+          initialRegion={currentRegion}
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+        >
           {markers.map((marker) => (
             <Marker
               key={marker.id}
@@ -106,9 +139,11 @@ export default function MapScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
   },
   map: {
     width: "100%",
-    height: "100%",
+    height: "95%",
+    marginTop: 30,
   },
 });
