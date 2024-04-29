@@ -13,6 +13,8 @@ import {
   Paragraph,
   Button,
   ActivityIndicator,
+  Dialog,
+  Portal,
 } from "react-native-paper";
 import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,6 +33,8 @@ const HomeScreen = ({ navigation }) => {
     useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [reservationCanceling, setReservationCanceling] = useState(false);
+  const [cancelDialogVisible, setCancelDialogVisible] = useState(false);
+  const [cancelReservationId, setCancelReservationId] = useState(null);
 
   const fetchBusinesses = async () => {
     try {
@@ -87,6 +91,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const cancelReservation = async (reservationId) => {
+    console.log("Cancelling reservation with id:", reservationId);
     setReservationCanceling(true);
     const userToken = await SecureStore.getItemAsync("userToken");
     const apiUrl = `http://${IP_ADDRESS}:8080/api/buyer/cancel/${reservationId}`;
@@ -184,7 +189,10 @@ const HomeScreen = ({ navigation }) => {
                       />
                     ) : (
                       <Button
-                        onPress={() => cancelReservation(item.id)}
+                        onPress={() => {
+                          setCancelReservationId(item.id);
+                          setCancelDialogVisible(true);
+                        }}
                         textColor="#ffda6b"
                         mode="text"
                       >
@@ -208,6 +216,27 @@ const HomeScreen = ({ navigation }) => {
           </>
         </View>
       )}
+      <Portal>
+        <Dialog visible={cancelDialogVisible}>
+          <Dialog.Title>Cancel Reservation</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>
+              Are you sure you want to cancel this reservation?
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                setCancelDialogVisible(false);
+                cancelReservation(cancelReservationId);
+              }}
+            >
+              Yes
+            </Button>
+            <Button onPress={() => setCancelDialogVisible(false)}>No</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       <Text style={{ marginLeft: "5%" }} variant="headlineSmall">
         Available offers right now
       </Text>

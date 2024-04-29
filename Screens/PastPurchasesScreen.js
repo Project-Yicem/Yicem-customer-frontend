@@ -40,13 +40,27 @@ const PastPurchasesScreen = ({ navigation }) => {
       });
 
       setRecentPurchases(response.data);
+
+      // Sort purchases by date, latest first
+      response.data.sort((a, b) => {
+        return new Date(b.transactionDate) - new Date(a.transactionDate);
+      });
+
       // Format all time objects to be more readable
       setRecentPurchases(
         response.data.map((purchase) => {
           const transactionDate = new Date(purchase.transactionDate);
           const formattedDate = `${transactionDate.getDate()}/${
             transactionDate.getMonth() + 1
-          }/${transactionDate.getFullYear()} - ${transactionDate.getHours()}:${transactionDate.getMinutes()}`;
+          }/${transactionDate.getFullYear()} - ${
+            transactionDate.getHours() < 10
+              ? "0" + transactionDate.getHours()
+              : transactionDate.getHours()
+          }:${
+            transactionDate.getMinutes() < 10
+              ? "0" + transactionDate.getMinutes()
+              : transactionDate.getMinutes()
+          }`;
           return { ...purchase, transactionDate: formattedDate };
         })
       );
@@ -157,7 +171,7 @@ const PastPurchasesScreen = ({ navigation }) => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Text variant="titleLarge">{purchase.sellerId}</Text>
+                  <Text variant="titleLarge">{purchase.sellerName}</Text>
                   <View
                     style={{
                       flexDirection: "row",
@@ -165,7 +179,7 @@ const PastPurchasesScreen = ({ navigation }) => {
                     }}
                   >
                     <Text style={{ marginTop: 7 }} variant="bodyLarge">
-                      {purchase.offerId}
+                      {purchase.offerName}
                     </Text>
                   </View>
                   <View
@@ -194,11 +208,9 @@ const PastPurchasesScreen = ({ navigation }) => {
                         setReviewTransactionId(purchase.id)
                       }
                       style={{ marginTop: 16 }}
-                      disabled={
-                        purchase.review !== null && purchase.review != ""
-                      }
+                      disabled={purchase.review && purchase.review != ""}
                     >
-                      {purchase.review === null || purchase.review === ""
+                      {!purchase.review || purchase.review === ""
                         ? "Leave a Review"
                         : "Review Submitted"}
                     </Button>

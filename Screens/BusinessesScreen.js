@@ -6,6 +6,7 @@ import {
   Title,
   Paragraph,
   ActivityIndicator,
+  Button,
 } from "react-native-paper";
 import styles, { theme } from "../Styles/styles";
 import { LinearGradient } from "expo-linear-gradient";

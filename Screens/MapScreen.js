@@ -62,6 +62,7 @@ export default function MapScreen({ navigation }) {
           title: business.businessName,
           description: business.address,
           logo: business.logo,
+          isOpen: business.open,
         }))
       );
       console.log("Business data fetched in Map screen");
@@ -122,10 +123,19 @@ export default function MapScreen({ navigation }) {
               title={marker.title}
               description={marker.description}
             >
-              <Callout onPress={() => onCalloutPress(marker.id)}>
+              <Callout
+                onPress={() => onCalloutPress(marker.id)}
+                style={{
+                  width: 200,
+                  height: 100,
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
                 <View>
                   <Title>{marker.title}</Title>
                   <Text>{marker.description}</Text>
+                  <Text>{marker.isOpen ? "Open" : "Closed"}</Text>
                 </View>
               </Callout>
             </Marker>

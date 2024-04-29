@@ -85,12 +85,26 @@ const ProfileScreen = ({ navigation }) => {
         },
       });
       console.log("Recent purchases data fetched in ProfileScreen");
+
+      // Sort purchases by date, latest first
+      response.data.sort((a, b) => {
+        return new Date(b.transactionDate) - new Date(a.transactionDate);
+      });
+
       // Format the dates and times to be more readable
       const formattedPurchases = response.data.map((purchase) => {
         const transactionDate = new Date(purchase.transactionDate);
         const formattedDate = `${transactionDate.getDate()}/${
           transactionDate.getMonth() + 1
-        }/${transactionDate.getFullYear()} - ${transactionDate.getHours()}:${transactionDate.getMinutes()}`;
+        }/${transactionDate.getFullYear()} - ${
+          transactionDate.getHours() < 10
+            ? "0" + transactionDate.getHours()
+            : transactionDate.getHours()
+        }:${
+          transactionDate.getMinutes() < 10
+            ? "0" + transactionDate.getMinutes()
+            : transactionDate.getMinutes()
+        }`;
         return { ...purchase, transactionDate: formattedDate };
       });
       setRecentPurchases(formattedPurchases);
@@ -325,7 +339,7 @@ const ProfileScreen = ({ navigation }) => {
                       }}
                     >
                       <Text style={{ marginTop: 7 }} variant="bodyLarge">
-                        {recentPurchases[0].offerId}
+                        {recentPurchases[0].offerName}
                       </Text>
                     </View>
                     <View

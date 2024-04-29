@@ -185,7 +185,6 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
     };
 
     fetchData();
-    console.log("Business details screen mounted", business);
   }, []);
 
   const favOrUnfavBusiness = async (businessId) => {
@@ -340,7 +339,10 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
                   style={{ marginRight: 4, color: "white" }}
                 />
                 <Paragraph style={{ color: "white" }}>
-                  {business.rating ? business.rating : "No ratings yet"}
+                  {/* If business rating is present, show it but only up the 0.1th accuracy, like 3.7 */}
+                  {business.rating
+                    ? business.rating.toFixed(1)
+                    : "No ratings yet"}
                 </Paragraph>
                 <Button
                   mode="text"
