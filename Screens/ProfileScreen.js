@@ -17,6 +17,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { IP_ADDRESS } from "../Functions/GetIP";
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "react-native";
+import ProfilePicturePicker from "../Components/ProfilePicturePicker";
 
 const ProfileScreen = ({ navigation }) => {
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] =
@@ -35,6 +38,7 @@ const ProfileScreen = ({ navigation }) => {
     confirmPassword: "",
   });
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [testImageUri, setTestImageUri] = useState("");
 
   const handleChangePassword = async (passwordState) => {
     console.log("Changing password with state:", passwordState);
@@ -330,7 +334,7 @@ const ProfileScreen = ({ navigation }) => {
                     }}
                   >
                     <Text variant="titleLarge">
-                      {recentPurchases[0].sellerId}
+                      {recentPurchases[0].sellerName}
                     </Text>
                     <View
                       style={{
@@ -413,6 +417,12 @@ const ProfileScreen = ({ navigation }) => {
             </Card>
           </TouchableOpacity>
         ))}
+        {/* Profile Picture Picker. Not used in this app, usage example:
+        <ProfilePicturePicker
+          profilePicture={testImageUri}
+          setProfilePicture={setTestImageUri}
+        />
+      */}
       </View>
       {/* Change Password Modal */}
       <Portal>
