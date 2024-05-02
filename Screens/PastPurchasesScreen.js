@@ -178,9 +178,18 @@ const PastPurchasesScreen = ({ navigation }) => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <Text style={{ marginTop: 7 }} variant="bodyLarge">
-                      {purchase.offerName}
-                    </Text>
+                    {purchase.offerName ? (
+                      <Text style={{ marginTop: 7 }} variant="bodyLarge">
+                        {purchase.offerName}
+                      </Text>
+                    ) : (
+                      <Text
+                        style={{ marginTop: 7, fontStyle: "italic" }}
+                        variant="bodyLarge"
+                      >
+                        offer no longer available
+                      </Text>
+                    )}
                   </View>
                   <View
                     style={{

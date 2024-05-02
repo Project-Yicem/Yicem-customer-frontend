@@ -295,7 +295,7 @@ const ProfileScreen = ({ navigation }) => {
             marginTop: 2,
           }}
         >
-          <Title style={{ color: "white" }}>Recent Purchases:</Title>
+          <Title style={{ color: "white" }}>Latest Purchase:</Title>
           <Card
             mode="outlined"
             style={{

@@ -32,6 +32,10 @@ const ReviewsScreen = ({ navigation, route }) => {
       });
 
       console.log("Reviews data fetched in ReviewsScreen", response.data);
+
+      // Flip the reviews array backwards
+      response.data.reverse();
+
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews data:", error);
