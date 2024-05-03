@@ -54,6 +54,13 @@ export default function MapScreen({ navigation }) {
       const response = await axios.get(apiUrl);
       setBusinessData(response.data);
 
+      // Filter out the businesses that don't have a locationLatitude or locationLongitude
+      response.data = response.data.filter(
+        (business) =>
+          business.locationLatitude !== null &&
+          business.locationLongitude !== null
+      );
+
       setMarkers(
         response.data.map((business) => ({
           id: business.id,
