@@ -28,6 +28,24 @@ export default function RegisterScreen({ navigation }) {
     console.log(
       `Registration pressed with email: ${email} and password: ${password} and name: ${name} and confirm password: ${confirmPassword}`
     );
+
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(email)) {
+      setErrorText("Please enter a valid email address");
+      setErrorVisible(true);
+      return;
+    }
+    if (password.length < 6) {
+      setErrorText("Password must be at least 6 characters long");
+      setErrorVisible(true);
+      return;
+    }
+    if (name.length < 3) {
+      setErrorText("Username must be at least 3 characters long");
+      setErrorVisible(true);
+      return;
+    }
+
     const apiUrl = `http://${IP_ADDRESS}:8080/api/auth/signup/buyer`;
     if (!email || !password || !confirmPassword || !name) {
       setErrorText("Please make sure that none of the fields are empty");
@@ -57,6 +75,8 @@ export default function RegisterScreen({ navigation }) {
       setErrorText("Error registering user: " + error.message);
       setIsRegisterLoading(false);
     }
+
+    setIsRegisterLoading(false);
   };
 
   return (

@@ -136,6 +136,11 @@ const BusinessDetailsScreen = ({ navigation, route }) => {
   };
 
   const makeReservation = async (time) => {
+    if (!time) {
+      alert("Please choose a pickup time for your reservation");
+      return;
+    }
+
     setIsMakeReservationLoading(true);
     setReservationTime(`${time.pickupTimeStart} - ${time.pickupTimeEnd}`);
     console.log(
